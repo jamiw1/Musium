@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:localMusicPlayerTest.Styles">
+    
+    <DataTemplate x:Key="StyledHeaderTemplate">
+        <TextBlock Text="{Binding}" 
+                   Style="{ThemeResource SubtitleTextBlockStyle}"
+                   Margin="0,12,0,4"/>
+    </DataTemplate>
+
+</ResourceDictionary>

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "localMusicPlayerTest (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "localMusicPlayerTest (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
