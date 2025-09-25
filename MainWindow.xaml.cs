@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -10,27 +5,38 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Security.AccessControl;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace localMusicPlayerTest
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
+            
 
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(Titlebar);
 
-            RootFrame.Navigate(typeof(localMusicPlayerTest.Pages.Albums));
+            UpdateNavigationViewSelection(typeof(localMusicPlayerTest.Pages.Albums));
+
+            AudioPlayerElement.SetMediaPlayer(App.Player);
+        }
+        private void UpdateNavigationViewSelection(Type pageType)
+        {
+            RootFrame.Navigate(pageType);
+            var itemToSelect = RootNavigationView.MenuItems
+                                      .OfType<NavigationViewItem>()
+                                      .FirstOrDefault(item => item.Tag?.ToString() == pageType.FullName);
+            RootNavigationView.SelectedItem = itemToSelect;
         }
 
         private void rootNav_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
@@ -45,7 +51,23 @@ namespace localMusicPlayerTest
 
                 if (pageType != null && !Type.Equals(pageType, currentPageType))
                 {
-                    RootFrame.Navigate(pageType);
+                    UpdateNavigationViewSelection(pageType);
+                }
+            }
+        }
+        private void rootNav_TitleNavClicked(object sender, RoutedEventArgs args)
+        {
+            var clickedButton = sender as Button;
+
+            if (clickedButton?.Tag is string pageName)
+            {
+                Type pageType = Type.GetType(pageName);
+
+                var currentPageType = RootFrame.CurrentSourcePageType;
+
+                if (pageType != null && !Type.Equals(pageType, currentPageType))
+                {
+                    UpdateNavigationViewSelection(pageType);
                 }
             }
         }
@@ -54,6 +76,7 @@ namespace localMusicPlayerTest
             if (RootFrame.CanGoBack)
             {
                 RootFrame.GoBack();
+                UpdateNavigationViewSelection(RootFrame.CurrentSourcePageType);
             }
         }
 

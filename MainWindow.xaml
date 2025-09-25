@@ -11,7 +11,7 @@
     Title="localMusicPlayerTest">
 
     <Window.SystemBackdrop>
-        <MicaBackdrop />
+        <MicaBackdrop Kind="Base"/>
     </Window.SystemBackdrop>
     <Grid>
         <Grid.RowDefinitions>
@@ -19,23 +19,27 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-    <TitleBar Title="Musium"
-              x:Name="Titlebar"
-              IsBackButtonVisible="True"
-              IsBackButtonEnabled="{x:Bind RootFrame.CanGoBack, Mode=OneWay}"
-              BackRequested="TitleBar_BackRequested"
-              IsPaneToggleButtonVisible="True"
-              PaneToggleRequested="TitleBar_PaneToggleRequested">
-    </TitleBar>
+        <MediaPlayerElement x:Name="AudioPlayerElement"
+            AreTransportControlsEnabled="False"
+            Height="0"/>
 
-    <NavigationView x:Name="RootNavigationView" Grid.Row="1"
-                    IsBackButtonVisible="Collapsed"
-                    IsPaneToggleButtonVisible="False"
-                    ItemInvoked="rootNav_ItemInvoked">
+        <TitleBar Title="Musium"
+            x:Name="Titlebar"
+            IsBackButtonVisible="True"
+            IsBackButtonEnabled="{x:Bind RootFrame.CanGoBack, Mode=OneWay}"
+            BackRequested="TitleBar_BackRequested"
+            IsPaneToggleButtonVisible="True"
+            PaneToggleRequested="TitleBar_PaneToggleRequested">
+        </TitleBar>
+        <NavigationView x:Name="RootNavigationView" Grid.Row="1"
+            PaneDisplayMode="Auto"
+            IsBackButtonVisible="Collapsed"
+            IsPaneToggleButtonVisible="False"
+            ItemInvoked="rootNav_ItemInvoked">
             <NavigationView.MenuItems>
                 <NavigationViewItem 
                     Content="Now Playing"
-                    Tag="localMusicPlayerTest.Pages.NowPlaying">
+                    Tag="localMusicPlayerTest.Pages.NowPlaying">        
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="Play" />
                     </NavigationViewItem.Icon>
@@ -58,7 +62,7 @@
                     Content="Tracks"
                     Tag="localMusicPlayerTest.Pages.Tracks">
                     <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="MusicInfo" />
+                        <SymbolIcon Symbol="Audio" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>

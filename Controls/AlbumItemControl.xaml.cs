@@ -18,9 +18,9 @@ using Windows.Foundation.Collections;
 
 namespace localMusicPlayerTest.Controls
 {
-    public sealed partial class AlbumItem : UserControl
+    public sealed partial class AlbumItemControl : UserControl
     {
-        public AlbumItem()
+        public AlbumItemControl()
         {
             InitializeComponent();
         }
@@ -34,12 +34,12 @@ namespace localMusicPlayerTest.Controls
             DependencyProperty.Register(
                 "AlbumTitle",
                 typeof(string),
-                typeof(AlbumItem),
+                typeof(AlbumItemControl),
                 new PropertyMetadata("Default Title", new PropertyChangedCallback(OnAlbumTitleChanged))
             );
         private static void OnAlbumTitleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            AlbumItem control = d as AlbumItem;
+            AlbumItemControl control = d as AlbumItemControl;
             if (control != null)
             {
                 control.albumTitleText.Text = e.NewValue as string;
@@ -55,12 +55,12 @@ namespace localMusicPlayerTest.Controls
             DependencyProperty.Register(
                 "ArtistName",
                 typeof(string),
-                typeof(AlbumItem),
+                typeof(AlbumItemControl),
                 new PropertyMetadata("Default Artist", new PropertyChangedCallback(OnArtistNameChanged))
             );
         private static void OnArtistNameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            AlbumItem control = d as AlbumItem;
+            AlbumItemControl control = d as AlbumItemControl;
             if (control != null)
             {
                 control.artistNameText.Text = e.NewValue as string;
@@ -77,12 +77,12 @@ namespace localMusicPlayerTest.Controls
             DependencyProperty.Register(
                 "Source",
                 typeof(ImageSource),
-                typeof(AlbumItem),
+                typeof(AlbumItemControl),
                 new PropertyMetadata("ms-appx:///Assets/Placeholder.png", new PropertyChangedCallback(OnSourceChanged))
             );
         private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            AlbumItem control = d as AlbumItem;
+            AlbumItemControl control = d as AlbumItemControl;
             if (control != null)
             {
                 control.albumArtImage.Source = e.NewValue as ImageSource;

@@ -10,10 +10,10 @@
     mc:Ignorable="d">
 
     <GridView Margin="16" Header="Albums" HeaderTemplate="{StaticResource StyledHeaderTemplate}">
-        <controls:AlbumItem AlbumTitle="Poob" ArtistName="Granded"/>
-        <controls:AlbumItem AlbumTitle="2" ArtistName="Drake"/>
-        <controls:AlbumItem AlbumTitle="Radical" ArtistName="Innocuous Tingle"/>
-        <controls:AlbumItem AlbumTitle="Fire Extinguisher" ArtistName="Vop drop drop"/>
-        <controls:AlbumItem AlbumTitle="Material goo Forture" ArtistName="Wha"/>
+        <controls:AlbumItemControl AlbumTitle="Poob" ArtistName="Granded"/>
+        <controls:AlbumItemControl AlbumTitle="2" ArtistName="Drake"/>
+        <controls:AlbumItemControl AlbumTitle="Radical" ArtistName="Innocuous Tingle"/>
+        <controls:AlbumItemControl AlbumTitle="Fire Extinguisher" ArtistName="Vop drop drop"/>
+        <controls:AlbumItemControl AlbumTitle="Material goo Forture" ArtistName="Wha"/>
     </GridView>
 </Page>

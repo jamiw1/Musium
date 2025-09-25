@@ -4,10 +4,10 @@
     
     xmlns:controls="using:localMusicPlayerTest.Controls">
 
-    <Style TargetType="controls:AlbumItem">
+    <Style TargetType="controls:AlbumItemControl">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="controls:AlbumItem">
+                <ControlTemplate TargetType="controls:AlbumItemControl">
                     <Border
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"

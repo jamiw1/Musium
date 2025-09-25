@@ -16,7 +16,9 @@
     <Content Remove="Assets\Placeholder.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Controls\AlbumItem.xaml" />
+    <None Remove="Controls\QueueListItemControl.xaml" />
+    <None Remove="Controls\TrackItemControl.xaml" />
+    <None Remove="Pages\NowPlaying.xaml" />
     <None Remove="Styles\GridContentStyles.xaml" />
   </ItemGroup>
 
@@ -50,9 +52,18 @@
     <None Update="Assets\Placeholder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Controls\TrackItemControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Controls\QueueListItemControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Pages\NowPlaying.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Controls\AlbumItem.xaml">
+    <Page Update="Controls\AlbumItemControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

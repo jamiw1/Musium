@@ -6,9 +6,54 @@
     xmlns:local="using:localMusicPlayerTest.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:localMusicPlayerTest.Controls"
     mc:Ignorable="d">
 
     <Grid>
-        <TextBlock Text="this is the tracks page" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <Grid RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" ColumnSpacing="32" Padding="16" Margin="0,0,0,-16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Frame Grid.Column="0" Width="48"/>
+                <TextBlock Grid.Column="1" Text="Track Info" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="-8,0,0,0"/>
+                <TextBlock Grid.Column="2" Text="Album" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+                <TextBlock Grid.Column="3" Text="Genre" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+                <TextBlock Grid.Column="4" Text="Format" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+                <TextBlock Grid.Column="5" Text="Length" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+            </Grid>
+            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" HorizontalScrollMode="Disabled">
+                <StackPanel Padding="16">
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                    <controls:TrackItemControl />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </Page>
