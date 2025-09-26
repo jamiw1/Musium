@@ -1,17 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.UI.Xaml.Media.Imaging;
+using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace localMusicPlayerTest.Models
 {
-    public class Song
+    public class Song : ObservableObject
     {
-        public string Title { get; set; }
-        public string ArtistName { get; set; }
-        public string AlbumName { get; set; }
-        public string FilePath { get; set; }
-        public float Length { get; set; }
+        private string _title;
+        public string Title
+        {
+            get => _title;
+            set
+            {
+                _title = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Album _album;
+        public Album Album
+        {
+            get => _album;
+            set
+            {
+                _album = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _filePath;
+        public string FilePath
+        {
+            get => _filePath;
+            set
+            {
+                _filePath = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string? _genre;
+        public string? Genre
+        {
+            get => _genre;
+            set
+            {
+                _genre = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _lossless;
+        public bool Lossless
+        {
+            get => _lossless;
+            set
+            {
+                _lossless = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private TimeSpan _duration;
+        public TimeSpan Duration
+        {
+            get => _duration;
+            set
+            {
+                _duration = value;
+                OnPropertyChanged();
+            }
+        }
     }
 }

@@ -1,47 +1,142 @@
+using localMusicPlayerTest.Controls;
 using localMusicPlayerTest.Models;
+using localMusicPlayerTest.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Devices.Geolocation;
+using Windows.Devices.Radios;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Media.Core;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using Windows.Media.Playback;
+using Windows.Storage.Streams;
 
 namespace localMusicPlayerTest.Pages;
 
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
-public sealed partial class NowPlaying : Page
+public sealed partial class NowPlaying : Page, INotifyPropertyChanged
 {
-    private Song testSong = new Song();
+    public event PropertyChangedEventHandler? PropertyChanged;
+    void OnPropertyChanged([CallerMemberName] string? name = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+    public AudioService Audio { get; } = AudioService.Instance;
+    private bool _mouseDown;
+
+    public float CurrentTimeStamp { get; set; }
+    private BitmapImage? _displayedCoverArt;
+    public BitmapImage? DisplayedCoverArt
+    {
+        get => _displayedCoverArt;
+        private set
+        {
+            _displayedCoverArt = value;
+            OnPropertyChanged();
+        }
+    }
+
+
     public NowPlaying()
     {
         InitializeComponent();
+
+        Audio.PositionChanged += Audio_PositionChanged;
+
+        this.Unloaded += (s, e) =>
+        {
+            Audio.PositionChanged -= Audio_PositionChanged;
+        };
+    }
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+
+        if (Audio.CurrentSongPlaying is Song currentSong)
+        {
+            if (currentSong.Album?.CoverArtData is byte[] imageData)
+            {
+                var stream = new InMemoryRandomAccessStream();
+                await stream.WriteAsync(imageData.AsBuffer());
+                stream.Seek(0);
+
+                var bitmapImage = new BitmapImage();
+                bitmapImage.DecodePixelWidth = 320;
+                await bitmapImage.SetSourceAsync(stream);
+
+                DisplayedCoverArt = bitmapImage;
+            }
+        }
+    }
+    private void Audio_PositionChanged(object sender, TimeSpan newPos)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            TimeElapsed.Text = $"{newPos:m\\:ss}";
+            ProgressSlider.Value = newPos.TotalSeconds;
+        });
+    }
+    private void RewindButton_Click(object sender, RoutedEventArgs e)
+    {
+
     }
 
     private void PlayButton_Click(object sender, RoutedEventArgs e)
     {
-        testSong.Title = "Nomu";
-        testSong.ArtistName = "Good Kid";
-        testSong.AlbumName = "Good Kid";
-        testSong.FilePath = "C:/Users/jamied/Nextcloud/Music/Streamed/The FLACS/Good Kid - Good Kid/Good Kid - Good Kid EP - 01 Nomu.flac";
-        
+        switch (Audio.CurrentState)
+        {
+            case MediaPlayerState.Closed:
+                break;
+            case MediaPlayerState.Opening:
+                break;
+            case MediaPlayerState.Buffering:
+                Audio.Pause();
+                break;
+            case MediaPlayerState.Playing:
+                Audio.Pause();
+                break;
+            case MediaPlayerState.Paused:
+                Audio.Resume();
+                break;
+            case MediaPlayerState.Stopped:
+                break;
+            default:
+                break;
+        }
     }
 
-    private void ProgressSlider_ValueChanged()
+    private void ProgressSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-
+        if (_mouseDown)
+        {
+            Audio.ScrubTo((int)Math.Ceiling(e.NewValue));
+        }
     }
+
+    private void ProgressSlider_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        _mouseDown = true;
+        Debug.Print("a");
+    }
+
+    private void ProgressSlider_PointerReleased(object sender, PointerRoutedEventArgs e)
+    {
+        _mouseDown = false;
+        Debug.Print("b");
+    }
+
+    
 }

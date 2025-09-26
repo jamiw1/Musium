@@ -1,3 +1,4 @@
+using localMusicPlayerTest.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -18,25 +19,31 @@ namespace localMusicPlayerTest
 {
     public sealed partial class MainWindow : Window
     {
+        private readonly AudioService _audioService = AudioService.Instance;
+        public static NavigationView MainNavView;
+        public static Frame RootNavFrame;
         public MainWindow()
         {
             InitializeComponent();
-            
+
+            MainNavView = RootNavigationView;
+            RootNavFrame = RootFrame;
 
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(Titlebar);
 
             UpdateNavigationViewSelection(typeof(localMusicPlayerTest.Pages.Albums));
 
-            AudioPlayerElement.SetMediaPlayer(App.Player);
+            _audioService.SetDispatcherQueue(DispatcherQueue);
+            _audioService.SetMediaPlayer(AudioPlayerElement);
         }
-        private void UpdateNavigationViewSelection(Type pageType)
+        public static void UpdateNavigationViewSelection(Type pageType)
         {
-            RootFrame.Navigate(pageType);
-            var itemToSelect = RootNavigationView.MenuItems
+            RootNavFrame.Navigate(pageType);
+            var itemToSelect = MainNavView.MenuItems
                                       .OfType<NavigationViewItem>()
                                       .FirstOrDefault(item => item.Tag?.ToString() == pageType.FullName);
-            RootNavigationView.SelectedItem = itemToSelect;
+            MainNavView.SelectedItem = itemToSelect;
         }
 
         private void rootNav_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)

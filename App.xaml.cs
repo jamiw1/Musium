@@ -1,4 +1,5 @@
 ﻿using localMusicPlayerTest.Models;
+using localMusicPlayerTest.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -25,14 +26,11 @@ namespace localMusicPlayerTest
     {
         private Window? _window;
 
-        
-
         public App()
         {
             InitializeComponent();
-        }
-        public void PlaySong(Song song)
-        {
+            var Audio = AudioService.Instance;
+            Audio.ScanDirectoryIntoLibrary("C:\\Users\\jamied\\Nextcloud\\Music\\Streamed");
         }
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
