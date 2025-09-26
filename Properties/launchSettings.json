@@ -1,9 +1,9 @@
 {
   "profiles": {
-    "localMusicPlayerTest (Package)": {
+    "Musium (Package)": {
       "commandName": "MsixPackage"
     },
-    "localMusicPlayerTest (Unpackaged)": {
+    "Musium (Unpackaged)": {
       "commandName": "Project"
     }
   }

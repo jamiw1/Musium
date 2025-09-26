@@ -1,6 +1,6 @@
-using localMusicPlayerTest.Controls;
-using localMusicPlayerTest.Models;
-using localMusicPlayerTest.Services;
+using Musium.Controls;
+using Musium.Models;
+using Musium.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -19,7 +19,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Media.Core;
 
-namespace localMusicPlayerTest.Pages
+namespace Musium.Pages
 {
     public sealed partial class Tracks : Page
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.UI.Xaml.Data;
 
-namespace localMusicPlayerTest.Converters
+namespace Musium.Converters
 {
     public class DurationConverter : IValueConverter
     {

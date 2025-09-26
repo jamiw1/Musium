@@ -1,4 +1,4 @@
-﻿using localMusicPlayerTest.Models;
+﻿using Musium.Models;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using System;
@@ -15,7 +15,7 @@ using Windows.Devices.Radios;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 
-namespace localMusicPlayerTest.Services
+namespace Musium.Services
 {
     public class AudioService : INotifyPropertyChanged
     {
@@ -24,7 +24,7 @@ namespace localMusicPlayerTest.Services
 
         private MediaPlayer _mediaPlayer;
         public event EventHandler<TimeSpan> PositionChanged;
-        
+
         private AudioService()
         {
             _mediaPlayer = new MediaPlayer();
@@ -156,55 +156,127 @@ namespace localMusicPlayerTest.Services
             _mediaPlayer.Position = new TimeSpan(0, 0, seconds);
         }
 
+        private static readonly List<string> audioExtensions = new List<string>
+        {
+            ".mp3",
+            ".m4a",
+            ".ogg",
+            ".wma",
+            ".flac",
+            ".alac",
+            ".wav",
+            ".aiff",
+            ".dsd"
+        };
+        private static readonly List<string> losslessAudioExtensions = new List<string>
+        {
+            ".flac",
+            ".alac",
+            ".wav",
+            ".aiff",
+            ".dsd"
+        };
         public async Task<Song> AddSongFromFile(string path)
         {
             if (!System.IO.File.Exists(path))
             {
-                throw new FileNotFoundException("path '" + path + "' is invalid");
+                throw new FileNotFoundException($"path '{path}' is invalid");
             }
-            var tfile = TagLib.File.Create(path);
-            if (!tfile.Properties.MediaTypes.Equals(MediaTypes.Audio))
+
+            var extension = System.IO.Path.GetExtension(path).ToLower();
+            if (!audioExtensions.Contains(extension))
             {
                 return null;
             }
-            Song song = new Song();
-            song.Title = tfile.Tag.Title;
-            var artistName = tfile.Tag.FirstPerformer;
-            var albumName = tfile.Tag.Album;
+
+            try
+            {
+                var tfile = TagLib.File.Create(path);
+
+                if (!tfile.Properties.MediaTypes.Equals(MediaTypes.Audio))
+                {
+                    return null;
+                }
+
+                var artist = GetArtistOrCreate(tfile.Tag.FirstPerformer);
+                var album = GetAlbumOrCreate(artist, tfile.Tag.Album);
+
+                var song = ExtractSongData(tfile, path, album);
+
+                return song;
+            }
+            catch (TagLib.CorruptFileException ex)
+            {
+                Console.WriteLine($"error with file {path}: {ex.Message}");
+                return null;
+            }
+        }
+        private Artist GetArtistOrCreate(string artistName)
+        {
             var artist = GetArtist(artistName);
             if (artist == null)
             {
-                artist = new Artist();
-                artist.Name = artistName;
-                artist.Albums = new List<Album>();
+                artist = new Artist
+                {
+                    Name = artistName,
+                    Albums = new List<Album>()
+                };
                 Database.Add(artist);
             }
+            return artist;
+        }
+
+        private Album GetAlbumOrCreate(Artist artist, string albumName)
+        {
             var album = artist.GetAlbum(albumName);
             if (album == null)
             {
-                album = new Album();
-                album.Title = albumName;
-                album.Artist = artist;
-                album.Songs = new List<Song>();
+                album = new Album
+                {
+                    Title = albumName,
+                    Artist = artist,
+                    Songs = new List<Song>()
+                };
                 artist.Albums.Add(album);
             }
+            return album;
+        }
 
-            song.Album = album;
-            song.FilePath = path;
-            song.Genre = tfile.Tag.FirstGenre;
-            song.Duration = tfile.Properties.Duration;
+        private Song ExtractSongData(TagLib.File tfile, string path, Album album)
+        {
+            var song = new Song
+            {
+                Title = tfile.Tag.Title,
+                Album = album,
+                FilePath = path,
+                Genre = tfile.Tag.FirstGenre,
+                Duration = tfile.Properties.Duration,
+                Lossless = IsLossless(path)
+            };
 
             album.Songs.Add(song);
 
             var pic = tfile.Tag.Pictures.ElementAtOrDefault(0);
-
             if (pic != null)
             {
-                byte[] imageData = pic.Data.ToArray();
-                album.CoverArtData = imageData;
+                album.CoverArtData = pic.Data.ToArray();
             }
-
             return song;
+        }
+        private bool IsLossless(string path)
+        {
+            var extension = System.IO.Path.GetExtension(path).ToLower();
+            if (!audioExtensions.Contains(extension))
+            {
+                return false;
+            }
+            return losslessAudioExtensions.Contains(extension);
+        }
+
+        public async void SetLibrary(string targetDirectory)
+        {
+            Database.Clear();
+            ScanDirectoryIntoLibrary(targetDirectory);
         }
 
         public async void ScanDirectoryIntoLibrary(string targetDirectory)

@@ -1,10 +1,12 @@
-using localMusicPlayerTest.Services;
+using Musium.Pages;
+using Musium.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
@@ -14,8 +16,9 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.AccessControl;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.ApplicationSettings;
 
-namespace localMusicPlayerTest
+namespace Musium
 {
     public sealed partial class MainWindow : Window
     {
@@ -32,7 +35,7 @@ namespace localMusicPlayerTest
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(Titlebar);
 
-            UpdateNavigationViewSelection(typeof(localMusicPlayerTest.Pages.Albums));
+            UpdateNavigationViewSelection(typeof(Musium.Pages.Albums));
 
             _audioService.SetDispatcherQueue(DispatcherQueue);
             _audioService.SetMediaPlayer(AudioPlayerElement);
@@ -48,18 +51,23 @@ namespace localMusicPlayerTest
 
         private void rootNav_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
-            if (args.InvokedItemContainer != null)
+            if (args.IsSettingsInvoked == true)
             {
-                var navItemTag = args.InvokedItemContainer.Tag.ToString();
+                rootNav_Navigate(typeof(SettingsPage), args.RecommendedNavigationTransitionInfo);
+            }
+            else if (args.InvokedItemContainer != null)
+            {
+                Type navPageType = Type.GetType(args.InvokedItemContainer.Tag.ToString());
+                rootNav_Navigate(navPageType, args.RecommendedNavigationTransitionInfo);
+            }
+        }
+        private void rootNav_Navigate(Type navPageType, NavigationTransitionInfo transitionInfo)
+        {
+            Type preNavPageType = RootFrame.CurrentSourcePageType;
 
-                Type pageType = Type.GetType(navItemTag);
-
-                var currentPageType = RootFrame.CurrentSourcePageType;
-
-                if (pageType != null && !Type.Equals(pageType, currentPageType))
-                {
-                    UpdateNavigationViewSelection(pageType);
-                }
+            if (navPageType is not null && !Type.Equals(preNavPageType, navPageType))
+            {
+                RootFrame.Navigate(navPageType, null, transitionInfo);
             }
         }
         private void rootNav_TitleNavClicked(object sender, RoutedEventArgs args)

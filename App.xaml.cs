@@ -1,5 +1,5 @@
-﻿using localMusicPlayerTest.Models;
-using localMusicPlayerTest.Services;
+﻿using Musium.Models;
+using Musium.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -19,23 +19,25 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Media.Core;
 using Windows.Media.Playback;
+using Windows.Storage;
 
-namespace localMusicPlayerTest
+namespace Musium
 {
     public partial class App : Application
     {
-        private Window? _window;
+        public static Window MainWindow { get; private set; }
 
         public App()
         {
             InitializeComponent();
+
             var Audio = AudioService.Instance;
             Audio.ScanDirectoryIntoLibrary("C:\\Users\\jamied\\Nextcloud\\Music\\Streamed");
         }
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            _window = new MainWindow();
-            _window.Activate();
+            MainWindow = new MainWindow();
+            MainWindow.Activate();
         }
     }
 }

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Musium.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Musium.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:tk="using:CommunityToolkit.WinUI.Controls"
+    xmlns:services="using:Musium.Services"
+    mc:Ignorable="d">
+
+    <StackPanel Padding="16" MaxWidth="1200" Spacing="32">
+        <TextBlock FontSize="20" FontWeight="SemiBold" Text="Settings"/>
+
+        <StackPanel Spacing="8">
+            <TextBlock FontSize="14" FontWeight="SemiBold" Text="Library"/>
+            <tk:SettingsCard 
+                Header="Libary location"
+                Description="The directory in which Musium scans for music">
+                <tk:SettingsCard.HeaderIcon>
+                    <SymbolIcon Symbol="SyncFolder"/>
+                </tk:SettingsCard.HeaderIcon>
+                <tk:SettingsCard.Content>
+                    <StackPanel Orientation="Horizontal" Spacing="16">
+                        <TextBlock Text="{x:Bind services:SettingsService.Instance.LibraryPath, Mode=OneWay}" VerticalAlignment="Center" MaxWidth="400"/>
+                        <SplitButton Content="Browse" Click="LibraryPathSetting_Click"/>
+                    </StackPanel>
+                </tk:SettingsCard.Content>
+
+            </tk:SettingsCard>
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock FontSize="14" FontWeight="SemiBold" Text="About"/>
+            <tk:SettingsExpander
+                Header="Musium"
+                Description="Musium 2025, made with &#x003C;3 by jamiw">
+                <tk:SettingsExpander.HeaderIcon>
+                    <SymbolIcon Symbol="Audio"/>
+                </tk:SettingsExpander.HeaderIcon>
+                <tk:SettingsExpander.Content>
+                    <TextBlock FontSize="14" Text="v0.1.0"/>
+                </tk:SettingsExpander.Content>
+                <tk:SettingsExpander.Items>
+                    <tk:SettingsCard Header="Links" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
+                        <HyperlinkButton NavigateUri="https://github.com/jamiw1" Content="GitHub"/>
+                    </tk:SettingsCard>
+                </tk:SettingsExpander.Items>
+            </tk:SettingsExpander>
+        </StackPanel>
+    </StackPanel>
+</Page>

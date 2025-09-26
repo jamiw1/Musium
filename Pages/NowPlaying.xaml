@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-    x:Class="localMusicPlayerTest.Pages.NowPlaying"
+    x:Class="Musium.Pages.NowPlaying"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:localMusicPlayerTest.Pages"
-    xmlns:local2="using:localMusicPlayerTest.Converters"
+    xmlns:local="using:Musium.Pages"
+    xmlns:local2="using:Musium.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:controls="using:localMusicPlayerTest.Controls"
+    xmlns:controls="using:Musium.Controls"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -25,7 +25,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+        <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="12" MaxWidth="320">
             <Frame CornerRadius="4">
                 <Image Source="{x:Bind DisplayedCoverArt, Mode=OneWay, FallbackValue='/Assets/Placeholder.png'}" MaxWidth="320"/>
             </Frame>

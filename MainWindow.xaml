@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window
-    x:Class="localMusicPlayerTest.MainWindow"
+    x:Class="Musium.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:localMusicPlayerTest"
+    xmlns:local="using:Musium"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="localMusicPlayerTest">
+    Title="Musium">
 
     <Window.SystemBackdrop>
         <MicaBackdrop Kind="Base"/>
@@ -35,32 +35,33 @@
             PaneDisplayMode="Auto"
             IsBackButtonVisible="Collapsed"
             IsPaneToggleButtonVisible="False"
-            ItemInvoked="rootNav_ItemInvoked">
+            ItemInvoked="rootNav_ItemInvoked"
+            IsSettingsVisible="True">
             <NavigationView.MenuItems>
                 <NavigationViewItem 
                     Content="Now Playing"
-                    Tag="localMusicPlayerTest.Pages.NowPlaying">        
+                    Tag="Musium.Pages.NowPlaying">        
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="Play" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem 
                     Content="Albums"
-                    Tag="localMusicPlayerTest.Pages.Albums">
+                    Tag="Musium.Pages.Albums">
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="Pictures" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem 
                     Content="Artists"
-                    Tag="localMusicPlayerTest.Pages.Artists">
+                    Tag="Musium.Pages.Artists">
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="Microphone" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem 
                     Content="Tracks"
-                    Tag="localMusicPlayerTest.Pages.Tracks">
+                    Tag="Musium.Pages.Tracks">
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="Audio" />
                     </NavigationViewItem.Icon>

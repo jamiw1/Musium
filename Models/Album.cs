@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace localMusicPlayerTest.Models
+namespace Musium.Models
 {
     public class Album : ObservableObject
     {

@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
 using Windows.Media.Playback;
 
-namespace localMusicPlayerTest.Converters
+namespace Musium.Converters
 {
     public class PlaybackStateButtonConverter : IValueConverter
     {

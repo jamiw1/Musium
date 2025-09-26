@@ -1,6 +1,6 @@
-using localMusicPlayerTest.Controls;
-using localMusicPlayerTest.Models;
-using localMusicPlayerTest.Services;
+using Musium.Controls;
+using Musium.Models;
+using Musium.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -25,7 +25,7 @@ using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage.Streams;
 
-namespace localMusicPlayerTest.Pages;
+namespace Musium.Pages;
 
 public sealed partial class NowPlaying : Page, INotifyPropertyChanged
 {

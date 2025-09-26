@@ -1,4 +1,4 @@
-using localMusicPlayerTest.Models;
+using Musium.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -21,7 +21,7 @@ using Windows.Storage.Streams;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace localMusicPlayerTest.Controls;
+namespace Musium.Controls;
 
 public sealed partial class TrackItemControl : UserControl, INotifyPropertyChanged
 {
