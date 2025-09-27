@@ -49,6 +49,16 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         }
     }
 
+    private double _songProgressValue = 0;
+    public double SongProgressValue
+    {
+        get => _songProgressValue;
+        private set
+        {
+            _songProgressValue = value;
+            OnPropertyChanged();
+        }
+    }
 
     public NowPlaying()
     {
@@ -86,7 +96,7 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         DispatcherQueue.TryEnqueue(() =>
         {
             TimeElapsed.Text = $"{newPos:m\\:ss}";
-            ProgressSlider.Value = newPos.TotalSeconds;
+            SongProgressValue = newPos.TotalSeconds;
         });
     }
     private void RewindButton_Click(object sender, RoutedEventArgs e)
@@ -118,25 +128,33 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         }
     }
 
+    private void ProgressSlider_Loaded(object sender, RoutedEventArgs e)
+    {
+        ProgressSlider.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(ProgressSlider_PointerPressed), true);
+        ProgressSlider.AddHandler(UIElement.PointerReleasedEvent, new PointerEventHandler(ProgressSlider_PointerReleased), true);
+    }
+
+    private bool _isUserDragging = false;
+
+    private void ProgressSlider_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        _isUserDragging = true;
+        Audio.Pause();
+    }
+
     private void ProgressSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-        if (_mouseDown)
+        if (_isUserDragging)
         {
             Audio.ScrubTo((int)Math.Ceiling(e.NewValue));
         }
     }
 
-    private void ProgressSlider_PointerPressed(object sender, PointerRoutedEventArgs e)
-    {
-        _mouseDown = true;
-        Debug.Print("a");
-    }
-
     private void ProgressSlider_PointerReleased(object sender, PointerRoutedEventArgs e)
     {
-        _mouseDown = false;
-        Debug.Print("b");
+        _isUserDragging = false;
+        var slider = sender as Slider;
+        Audio.ScrubTo((int)Math.Ceiling(ProgressSlider.Value));
+        Audio.Resume();
     }
-
-    
 }

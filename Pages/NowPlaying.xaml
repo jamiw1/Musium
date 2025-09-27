@@ -43,14 +43,14 @@
                 <Slider x:Name="ProgressSlider"
                     Grid.Column="1"
                     Minimum="0" 
+                    Value="{x:Bind SongProgressValue, Mode=OneWay, FallbackValue='0'}"
                     Maximum="{x:Bind Audio.CurrentSongPlaying.Duration.TotalSeconds, Mode=OneWay, FallbackValue='-1'}"
                     TickFrequency="1"
                     TickPlacement="None"
                     Margin="16,0"
                     IsThumbToolTipEnabled="False"
                     ValueChanged="ProgressSlider_ValueChanged"
-                    PointerPressed="ProgressSlider_PointerPressed"
-                    PointerReleased="ProgressSlider_PointerReleased"/>
+                    Loaded="ProgressSlider_Loaded"/>
                 <TextBlock x:Name="SongLength" Grid.Column="2" Text="{x:Bind Audio.CurrentSongPlaying.Duration, 
                     Mode=OneWay, 
                     Converter={StaticResource DurationConverter},

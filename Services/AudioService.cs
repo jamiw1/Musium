@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using TagLib;
 using Windows.Media.Core;
 using Windows.Media.Playback;
+using System.Diagnostics;
 
 namespace Musium.Services
 {
@@ -332,6 +333,20 @@ namespace Musium.Services
             if (pic != null)
             {
                 album.CoverArtData = pic.Data.ToArray();
+            } 
+            else
+            {
+                var parent = Path.GetDirectoryName(path);
+                var jpgPath = Path.Combine(parent, "cover.jpg");
+                var pngPath = Path.Combine(parent, "cover.png");
+                if (System.IO.File.Exists(pngPath))
+                {
+                    album.CoverArtData = System.IO.File.ReadAllBytes(pngPath);
+                }
+                else if (System.IO.File.Exists(jpgPath))
+                {
+                    album.CoverArtData = System.IO.File.ReadAllBytes(jpgPath);
+                }
             }
             return song;
         }
@@ -348,10 +363,10 @@ namespace Musium.Services
         public async void SetLibrary(string targetDirectory)
         {
             Database.Clear();
-            ScanDirectoryIntoLibrary(targetDirectory);
+            await ScanDirectoryIntoLibrary(targetDirectory);
         }
 
-        public async void ScanDirectoryIntoLibrary(string targetDirectory)
+        public async Task ScanDirectoryIntoLibrary(string targetDirectory)
         {
             string[] fileEntries = Directory.GetFiles(targetDirectory);
             foreach (string fileName in fileEntries)
@@ -359,7 +374,7 @@ namespace Musium.Services
 
             string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
             foreach (string subdirectory in subdirectoryEntries)
-                ScanDirectoryIntoLibrary(subdirectory);
+                await ScanDirectoryIntoLibrary(subdirectory);
         }
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
