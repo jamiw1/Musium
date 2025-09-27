@@ -25,12 +25,12 @@
             
 
             <TextBlock x:Name="albumTitleText" 
-                   Text="{x:Bind Album.Title, Mode=OneWay, TargetNullValue='Title'}"
+                   Text="{x:Bind Album.Title, Mode=OneWay, TargetNullValue='(Missing title)'}"
                    TextTrimming="CharacterEllipsis"
                    FontWeight="Bold"/>
 
             <TextBlock x:Name="artistNameText" 
-                   Text="{x:Bind Album.Artist.Name, Mode=OneWay, TargetNullValue='Artist'}" 
+                   Text="{x:Bind Album.Artist.Name, Mode=OneWay, TargetNullValue='(Missing artist)'}" 
                    TextTrimming="CharacterEllipsis"
                    Foreground="Gray"/>
         </StackPanel>

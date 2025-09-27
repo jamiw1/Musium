@@ -10,7 +10,7 @@
 
     <Grid Padding="6" Height="60" HorizontalAlignment="Stretch">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Spacing="12" Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center">
@@ -22,8 +22,8 @@
                 <TextBlock Text="{x:Bind Song.Album.Artist.Name, Mode=OneWay, TargetNullValue='No Artist'}" FontSize="12" FontWeight="Light"/>
             </StackPanel>
         </StackPanel>
-        <Grid Grid.Column="1" HorizontalAlignment="Right" Background="Transparent" BorderThickness="0" Margin="16,0">
-            <SymbolIcon Symbol="GlobalNavigationButton"/>
+        <Grid Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,0">
+            <SymbolIcon Symbol="GlobalNavigationButton" VerticalAlignment="Center"/>
         </Grid>
     </Grid>
 </UserControl>

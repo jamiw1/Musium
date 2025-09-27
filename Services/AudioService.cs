@@ -14,6 +14,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using TagLib;
+using TagLib.Riff;
 using Windows.Graphics.Imaging;
 using Windows.Media.Core;
 using Windows.Media.Playback;
@@ -21,6 +22,17 @@ using Windows.Storage.Streams;
 
 namespace Musium.Services
 {
+    public enum RepeatState
+    {
+        Off,
+        Repeat,
+        RepeatOne
+    }
+    public enum ShuffleState
+    {
+        Off,
+        Shuffle
+    }
     public class AudioService : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -29,17 +41,7 @@ namespace Musium.Services
         private MediaPlayer _mediaPlayer;
         public event EventHandler<TimeSpan> PositionChanged;
 
-        public enum RepeatState
-        {
-            Off,
-            Repeat,
-            RepeatOne
-        }
-        public enum ShuffleState
-        {
-            Off,
-            Shuffle
-        }
+        
 
         private RepeatState _currentRepeatState = RepeatState.Off;
         public RepeatState CurrentRepeatState
@@ -95,6 +97,16 @@ namespace Musium.Services
         public ObservableCollection<Song> Queue = new ObservableCollection<Song>();
         private List<Song> _nonShuffledQueueBackup = new List<Song>();
         public List<Song> History = new List<Song>();
+
+        public void ShuffleQueue()
+        {
+            var rng = new Random();
+            for (int i = Queue.Count - 1; i > 0; i--)
+            {
+                int k = rng.Next(i + 1);
+                Queue.Move(k, i);
+            }
+        }
         public void ToggleShuffle()
         {
             CurrentShuffleState = CurrentShuffleState == ShuffleState.Off ? ShuffleState.Shuffle : ShuffleState.Off;
@@ -102,13 +114,7 @@ namespace Musium.Services
             if (CurrentShuffleState == ShuffleState.Shuffle)
             {
                 _nonShuffledQueueBackup = new List<Song>(Queue);
-
-                var rng = new Random();
-                for (int i = Queue.Count - 1; i > 0; i--)
-                {
-                    int k = rng.Next(i + 1);
-                    Queue.Move(k, i);
-                }
+                ShuffleQueue();
             }
             else
             {
@@ -197,6 +203,12 @@ namespace Musium.Services
         {
             var currentSong = CurrentSongPlaying;
 
+            if (CurrentRepeatState == RepeatState.RepeatOne && currentSong != null)
+            {
+                PlaySong(currentSong);
+                return;
+            }
+
             var songToPlay = Queue.FirstOrDefault();
             if (songToPlay != null)
             {
@@ -204,12 +216,47 @@ namespace Musium.Services
 
                 dispatcherQueue.TryEnqueue(() =>
                 {
-                    History.Add(currentSong);
-                    if (History.Count > 100) // capped history at 100, dunno if people actually use it past 100 songs so make PR/issue if u do
+                    if (currentSong != null)
                     {
-                        History.RemoveAt(0);
+                        History.Add(currentSong);
+                        if (History.Count > 100) // capped history at 100, dunno if people actually use it past 100 songs so make PR/issue if u do
+                        {
+                            History.RemoveAt(0);
+                        }
                     }
                     Queue.Remove(songToPlay);
+                });
+            }
+            else if (CurrentRepeatState == RepeatState.Repeat)
+            {
+                var fullPlaylist = new List<Song>(History);
+                if (currentSong != null)
+                {
+                    fullPlaylist.Add(currentSong);
+                }
+
+                if (!fullPlaylist.Any()) return;
+
+                dispatcherQueue.TryEnqueue(() =>
+                {
+                    Queue.Clear();
+                    History.Clear();
+                    foreach (var song in fullPlaylist)
+                    {
+                        Queue.Add(song);
+                    }
+
+                    if (CurrentShuffleState == ShuffleState.Shuffle)
+                    {
+                        ShuffleQueue();
+                    }
+
+                    var firstSongInNewQueue = Queue.FirstOrDefault();
+                    if (firstSongInNewQueue != null)
+                    {
+                        PlaySong(firstSongInNewQueue);
+                        Queue.Remove(firstSongInNewQueue);
+                    }
                 });
             }
         }
@@ -522,6 +569,7 @@ namespace Musium.Services
                 try
                 {
                     Queue.Clear();
+                    _nonShuffledQueueBackup.Clear();
                     foreach (var song in songs)
                     {
                         Queue.Add(song);

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Window
     x:Class="Musium.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -29,7 +28,13 @@
             IsBackButtonEnabled="{x:Bind RootFrame.CanGoBack, Mode=OneWay}"
             BackRequested="TitleBar_BackRequested"
             IsPaneToggleButtonVisible="True"
-            PaneToggleRequested="TitleBar_PaneToggleRequested">
+            PaneToggleRequested="TitleBar_PaneToggleRequested"
+            Grid.Row="0">
+            <TitleBar.Content>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    
+                </StackPanel>
+            </TitleBar.Content>
         </TitleBar>
         <NavigationView x:Name="RootNavigationView" Grid.Row="1"
             PaneDisplayMode="Auto"

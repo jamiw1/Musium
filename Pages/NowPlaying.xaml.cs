@@ -162,6 +162,10 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
     {
         Audio.NextSong();
     }
+    private void RepeatButton_Click(object sender, RoutedEventArgs e)
+    {
+        Audio.CycleRepeat();
+    }
 
     private void ProgressSlider_Loaded(object sender, RoutedEventArgs e)
     {
@@ -192,6 +196,4 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         Audio.ScrubTo((int)Math.Ceiling(ProgressSlider.Value));
         Audio.Resume();
     }
-
-    
 }

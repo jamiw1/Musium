@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Musium.Pages"
-    xmlns:local2="using:Musium.Converters"
+    xmlns:converters="using:Musium.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Musium.Controls"
@@ -12,8 +12,12 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <local2:DurationConverter x:Key="DurationConverter"/>
-        <local2:PlaybackStateButtonConverter x:Key="PlaybackStateButtonConverter"/>
+        <converters:DurationConverter x:Key="DurationConverter"/>
+        <converters:PlaybackStateButtonConverter x:Key="PlaybackStateButtonConverter"/>
+        <converters:ShuffleStateToBrushConverter x:Key="ShuffleStateToBrushConverter"/>
+        <converters:RepeatStateToBrushConverter x:Key="RepeatStateToBrushConverter"/>
+        <converters:RepeatStateToGlyphConverter x:Key="RepeatStateToGlyphConverter"/>
+        
         <Style x:Key="PlaybackButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="50"/>
             <Setter Property="Height" Value="50"/>
@@ -67,7 +71,7 @@
             </Grid>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
                 <Button Style="{StaticResource PlaybackButtonStyle}" Click="ShuffleButton_Click">
-                    <SymbolIcon Symbol="Shuffle"/>
+                    <SymbolIcon Symbol="Shuffle" Foreground="{x:Bind Audio.CurrentShuffleState, Mode=OneWay, Converter={StaticResource ShuffleStateToBrushConverter}}"/>
                 </Button>
                 <Button Style="{StaticResource PlaybackButtonStyle}" Click="RewindButton_Click">
                     <FontIcon Glyph="&#xeb9e;"/>
@@ -77,6 +81,11 @@
                 </Button>
                 <Button Style="{StaticResource PlaybackButtonStyle}" Click="ForwardButton_Click">
                     <FontIcon Glyph="&#xeb9d;"/>
+                </Button>
+                <Button Style="{StaticResource PlaybackButtonStyle}" Click="RepeatButton_Click">
+                    <FontIcon 
+                        Glyph="{x:Bind Audio.CurrentRepeatState, Mode=OneWay, Converter={StaticResource RepeatStateToGlyphConverter}}" 
+                        Foreground="{x:Bind Audio.CurrentRepeatState, Mode=OneWay, Converter={StaticResource RepeatStateToBrushConverter}}"/>
                 </Button>
             </StackPanel>
         </StackPanel>
