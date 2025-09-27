@@ -10,6 +10,7 @@ using Musium.Controls;
 using Musium.Models;
 using Musium.Services;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -27,6 +28,7 @@ namespace Musium.Pages
     public sealed partial class InnerAlbum : Page, INotifyPropertyChanged
     {
         private readonly AudioService Audio = AudioService.Instance;
+        private readonly Random _rng = new Random();
 
         public event PropertyChangedEventHandler? PropertyChanged;
         void OnPropertyChanged([CallerMemberName] string? name = null)
@@ -78,6 +80,35 @@ namespace Musium.Pages
                 Frame.Navigate(typeof(NowPlaying));
                 MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
             }
+        }
+
+        private async void PlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Audio.CurrentViewedAlbum == null)
+                return;
+            var firstSong = Audio.CurrentViewedAlbum.Songs.FirstOrDefault();
+            if (firstSong == null)
+                return;
+            Audio.SetShuffle(ShuffleState.Off);
+            await Audio.StartQueueFromAlbumSongAsync(firstSong);
+            Frame.Navigate(typeof(NowPlaying));
+            MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
+        }
+
+        private async void ShuffleButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Audio.CurrentViewedAlbum == null) return;
+            var songs = Audio.CurrentViewedAlbum.Songs.ToList();
+            if (!songs.Any()) return;
+
+            var randomIndex = _rng.Next(songs.Count);
+            var firstSong = songs.ElementAtOrDefault(randomIndex);
+            if (firstSong == null) return;
+
+            await Audio.StartShuffledQueueAsync(songs, firstSong);
+
+            Frame.Navigate(typeof(NowPlaying));
+            MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
         }
     }
 }

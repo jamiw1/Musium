@@ -24,7 +24,7 @@
                 <tk:SettingsCard.Content>
                     <StackPanel Orientation="Horizontal" Spacing="16">
                         <TextBlock Text="{x:Bind services:SettingsService.Instance.LibraryPath, Mode=OneWay}" VerticalAlignment="Center" MaxWidth="400"/>
-                        <SplitButton Content="Browse" Click="LibraryPathSetting_Click"/>
+                        <Button Content="Browse" Click="LibraryPathSetting_Click"/>
                     </StackPanel>
                 </tk:SettingsCard.Content>
 

@@ -15,6 +15,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using TagLib;
 using TagLib.Riff;
+using Windows.Devices.Radios;
 using Windows.Graphics.Imaging;
 using Windows.Media.Core;
 using Windows.Media.Playback;
@@ -41,7 +42,7 @@ namespace Musium.Services
         private MediaPlayer _mediaPlayer;
         public event EventHandler<TimeSpan> PositionChanged;
 
-        
+        private readonly Random _rng = new Random();
 
         private RepeatState _currentRepeatState = RepeatState.Off;
         public RepeatState CurrentRepeatState
@@ -110,7 +111,17 @@ namespace Musium.Services
         public void ToggleShuffle()
         {
             CurrentShuffleState = CurrentShuffleState == ShuffleState.Off ? ShuffleState.Shuffle : ShuffleState.Off;
+            ShuffleLogic();
+        }
 
+        public void SetShuffle(ShuffleState newState)
+        {
+            CurrentShuffleState = newState;
+            ShuffleLogic();
+        }
+
+        private void ShuffleLogic()
+        {
             if (CurrentShuffleState == ShuffleState.Shuffle)
             {
                 _nonShuffledQueueBackup = new List<Song>(Queue);
@@ -197,6 +208,30 @@ namespace Musium.Services
         private void OnMediaEnded(MediaPlayer sender, object args)
         {
             NextSong();
+        }
+
+        public void TogglePlayback()
+        {
+            switch (CurrentState)
+            {
+                case MediaPlayerState.Closed:
+                    break;
+                case MediaPlayerState.Opening:
+                    break;
+                case MediaPlayerState.Buffering:
+                    Pause();
+                    break;
+                case MediaPlayerState.Playing:
+                    Pause();
+                    break;
+                case MediaPlayerState.Paused:
+                    Resume();
+                    break;
+                case MediaPlayerState.Stopped:
+                    break;
+                default:
+                    break;
+            }
         }
 
         public void NextSong()
@@ -510,6 +545,7 @@ namespace Musium.Services
 
         public async Task ScanDirectoryIntoLibrary(string targetDirectory)
         {
+            if (!Directory.Exists(targetDirectory)) return;
             string[] fileEntries = Directory.GetFiles(targetDirectory);
             foreach (string fileName in fileEntries)
                 await AddSongFromFile(fileName);
@@ -537,7 +573,8 @@ namespace Musium.Services
                 return new List<Song>();
             });
 
-            await UpdateQueueOnUIThreadAsync(finalQueue, startingSong);
+            await SetQueueAsync(finalQueue, startingSong);
+            PlaySong(startingSong);
         }
 
         public async Task StartQueueFromSongAsync(Song startingSong)
@@ -558,9 +595,10 @@ namespace Musium.Services
                 return new List<Song>();
             });
 
-            await UpdateQueueOnUIThreadAsync(finalQueue, startingSong);
+            await SetQueueAsync(finalQueue, startingSong);
+            PlaySong(startingSong);
         }
-        private Task UpdateQueueOnUIThreadAsync(List<Song> songs, Song startingSong)
+        public Task SetQueueAsync(List<Song> songs, Song startingSong)
         {
             var tcs = new TaskCompletionSource();
 
@@ -574,7 +612,43 @@ namespace Musium.Services
                     {
                         Queue.Add(song);
                     }
+                    tcs.SetResult();
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+
+            return tcs.Task;
+        }
+        public Task StartShuffledQueueAsync(List<Song> songs, Song startingSong)
+        {
+            var tcs = new TaskCompletionSource();
+
+            dispatcherQueue.TryEnqueue(() =>
+            {
+                try
+                {
+                    _nonShuffledQueueBackup.Clear();
+                    foreach (var song in songs)
+                    {
+                        _nonShuffledQueueBackup.Add(song);
+                        _nonShuffledQueueBackup.Remove(startingSong);
+                    }
+
+                    Queue.Clear();
+                    var songsToShuffle = songs.Where(s => s != startingSong);
+                    var shuffledQueue = songsToShuffle.OrderBy(s => _rng.Next());
+                    foreach (var song in shuffledQueue)
+                    {
+                        Queue.Add(song);
+                    }
+
                     PlaySong(startingSong);
+
+                    CurrentShuffleState = ShuffleState.Shuffle;
+
                     tcs.SetResult();
                 }
                 catch (Exception ex)

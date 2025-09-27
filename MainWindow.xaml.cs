@@ -1,5 +1,3 @@
-using Musium.Pages;
-using Musium.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -8,8 +6,12 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using Musium.Models;
+using Musium.Pages;
+using Musium.Services;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -22,7 +24,7 @@ namespace Musium
 {
     public sealed partial class MainWindow : Window
     {
-        private readonly AudioService _audioService = AudioService.Instance;
+        private readonly AudioService Audio = AudioService.Instance;
         public static NavigationView MainNavView;
         public static Frame RootNavFrame;
         public MainWindow()
@@ -43,8 +45,39 @@ namespace Musium
 
             UpdateNavigationViewSelection(typeof(Musium.Pages.Albums));
 
-            _audioService.SetDispatcherQueue(DispatcherQueue);
-            _audioService.SetMediaPlayer(AudioPlayerElement);
+            Audio.SetDispatcherQueue(DispatcherQueue);
+            Audio.SetMediaPlayer(AudioPlayerElement);
+
+            Audio.PropertyChanged += Audio_PropertyChanged;
+            Closed += MainWindow_Closed;
+            UpdateTitle();
+        }
+        private void MainWindow_Closed(object sender, WindowEventArgs args)
+        {
+            Audio.PropertyChanged -= Audio_PropertyChanged;
+        }
+
+        private void Audio_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Audio.CurrentSongPlaying))
+            {
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    UpdateTitle();
+                });
+            }
+        }
+
+        private void UpdateTitle()
+        {
+            if (Audio.CurrentSongPlaying is Song currentSong)
+            {
+                Titlebar.Title = "Playing: " + currentSong.Title + " - " + currentSong.Album.Artist.Name;
+            }
+            else
+            {
+                Titlebar.Title = "Musium";
+            }
         }
         public static void UpdateNavigationViewSelection(Type pageType)
         {
@@ -74,22 +107,6 @@ namespace Musium
             if (navPageType is not null && !Type.Equals(preNavPageType, navPageType))
             {
                 RootFrame.Navigate(navPageType, null, transitionInfo);
-            }
-        }
-        private void rootNav_TitleNavClicked(object sender, RoutedEventArgs args)
-        {
-            var clickedButton = sender as Button;
-
-            if (clickedButton?.Tag is string pageName)
-            {
-                Type pageType = Type.GetType(pageName);
-
-                var currentPageType = RootFrame.CurrentSourcePageType;
-
-                if (pageType != null && !Type.Equals(pageType, currentPageType))
-                {
-                    UpdateNavigationViewSelection(pageType);
-                }
             }
         }
         private void TitleBar_BackRequested(TitleBar sender, object args)

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="Musium.Controls.TitlebarControls"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Musium.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:Musium.Converters"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <converters:PlaybackStateIconConverter x:Key="PlaybackStateIconConverter"/>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="Auto">
+        <AppBarButton Click="Rewind_Click">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#xEB9E;"/>
+            </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton Click="Play_Click" Icon="{x:Bind Audio.CurrentState, Mode=OneWay, Converter={StaticResource PlaybackStateIconConverter}, FallbackValue=Play}"/>
+        <AppBarButton Click="Skip_Click">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#xEB9D;"/>
+            </AppBarButton.Icon>
+        </AppBarButton>
+    </StackPanel>
+</UserControl>

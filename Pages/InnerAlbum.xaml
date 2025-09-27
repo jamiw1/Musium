@@ -39,13 +39,13 @@
                         <TextBlock Text="{x:Bind Audio.CurrentViewedAlbum.Artist.Name, Mode=OneWay, TargetNullValue='Artist'}" FontSize="16" FontWeight="Normal"/>
                     </StackPanel>
                     <StackPanel Grid.Row="2" Spacing="8" Orientation="Horizontal" VerticalAlignment="Bottom">
-                        <Button Style="{StaticResource AccentButtonStyle}">
+                        <Button Click="PlayButton_Click" Style="{StaticResource AccentButtonStyle}">
                             <StackPanel Orientation="Horizontal" Spacing="8" Padding="2">
                                 <SymbolIcon Symbol="Play"/>
                                 <TextBlock Text="Play"/>
                             </StackPanel>
                         </Button>
-                        <Button>
+                        <Button Click="ShuffleButton_Click">
                             <StackPanel Orientation="Horizontal" Spacing="8" Padding="2">
                                 <SymbolIcon Symbol="Shuffle"/>
                                 <TextBlock Text="Shuffle"/>

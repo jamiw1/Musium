@@ -136,26 +136,7 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
 
     private void PlayButton_Click(object sender, RoutedEventArgs e)
     {
-        switch (Audio.CurrentState)
-        {
-            case MediaPlayerState.Closed:
-                break;
-            case MediaPlayerState.Opening:
-                break;
-            case MediaPlayerState.Buffering:
-                Audio.Pause();
-                break;
-            case MediaPlayerState.Playing:
-                Audio.Pause();
-                break;
-            case MediaPlayerState.Paused:
-                Audio.Resume();
-                break;
-            case MediaPlayerState.Stopped:
-                break;
-            default:
-                break;
-        }
+        Audio.TogglePlayback();
     }
 
     private void ForwardButton_Click(object sender, RoutedEventArgs e)

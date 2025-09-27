@@ -19,6 +19,7 @@
   <ItemGroup>
     <None Remove="Assets\Icon.ico" />
     <None Remove="Controls\QueueListItemControl.xaml" />
+    <None Remove="Controls\TitlebarControls.xaml" />
     <None Remove="Controls\TrackItemControl.xaml" />
     <None Remove="Pages\InnerAlbum.xaml" />
     <None Remove="Pages\NowPlaying.xaml" />
@@ -61,6 +62,9 @@
     <None Update="Assets\Placeholder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Controls\TitlebarControls.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Pages\InnerAlbum.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
