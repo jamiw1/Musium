@@ -443,6 +443,27 @@ namespace Musium.Services
                 await ScanDirectoryIntoLibrary(subdirectory);
         }
 
+        public async Task StartQueueFromAlbumSongAsync(Song startingSong)
+        {
+            List<Song> finalQueue = await Task.Run(async () =>
+            {
+                var albumSongs = startingSong.Album.Songs;
+                int index = albumSongs.FindIndex(s => s == startingSong);
+
+                if (index == -1) return new List<Song>();
+
+                int startIndex = index + 1;
+                if (startIndex < albumSongs.Count)
+                {
+                    int count = albumSongs.Count - startIndex;
+                    return albumSongs.GetRange(startIndex, count);
+                }
+                return new List<Song>();
+            });
+
+            await UpdateQueueOnUIThreadAsync(finalQueue, startingSong);
+        }
+
         public async Task StartQueueFromSongAsync(Song startingSong)
         {
             List<Song> finalQueue = await Task.Run(async () =>

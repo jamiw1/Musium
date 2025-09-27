@@ -69,12 +69,12 @@ namespace Musium.Pages
                 }
             }
         }
-        private void TrackItemControl_Clicked(object sender, RoutedEventArgs e)
+        private async void TrackItemControl_Clicked(object sender, RoutedEventArgs e)
         {
             var clickedControl = sender as TrackItemControl;
             if (clickedControl != null)
             {
-                Audio.PlaySong(clickedControl.Song);
+                await Audio.StartQueueFromAlbumSongAsync(clickedControl.Song);
                 Frame.Navigate(typeof(NowPlaying));
                 MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
             }
