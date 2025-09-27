@@ -52,6 +52,18 @@ public sealed partial class TrackItemControl : UserControl, INotifyPropertyChang
         get => (Song)GetValue(SongProperty);
         set => SetValue(SongProperty, value);
     }
+
+    public static readonly DependencyProperty TrackViewProperty = DependencyProperty.Register(
+        "TrackView",
+        typeof(bool),
+        typeof(TrackItemControl),
+        new PropertyMetadata(null));
+    public bool TrackView
+    {
+        get => (bool)GetValue(TrackViewProperty);
+        set => SetValue(TrackViewProperty, value);
+    }
+
     public event RoutedEventHandler Clicked;
     private static async void OnSongChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {

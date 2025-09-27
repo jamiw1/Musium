@@ -53,13 +53,6 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem 
-                    Content="Artists"
-                    Tag="Musium.Pages.Artists">
-                    <NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Microphone" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-                <NavigationViewItem 
                     Content="Tracks"
                     Tag="Musium.Pages.Tracks">
                     <NavigationViewItem.Icon>

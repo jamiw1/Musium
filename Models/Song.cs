@@ -51,6 +51,28 @@ namespace Musium.Models
             }
         }
 
+        private int? _trackNumber;
+        public int? TrackNumber
+        {
+            get => _trackNumber;
+            set
+            {
+                _trackNumber = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _favorited;
+        public bool Favorited
+        {
+            get => _favorited;
+            set
+            {
+                _favorited = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool _lossless;
         public bool Lossless
         {

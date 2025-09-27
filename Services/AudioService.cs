@@ -4,14 +4,11 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 using TagLib;
-using Windows.Devices.Radios;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 
@@ -25,6 +22,62 @@ namespace Musium.Services
         private MediaPlayer _mediaPlayer;
         public event EventHandler<TimeSpan> PositionChanged;
 
+        public enum RepeatState
+        {
+            Off,
+            Repeat,
+            RepeatOne
+        }
+        public enum ShuffleState
+        {
+            Off,
+            Shuffle
+        }
+
+        private RepeatState _currentRepeatState = RepeatState.Off;
+        public RepeatState CurrentRepeatState
+        {
+            get => _currentRepeatState;
+            private set
+            {
+                _currentRepeatState = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ShuffleState _currentShuffleState = ShuffleState.Off;
+        public ShuffleState CurrentShuffleState
+        {
+            get => _currentShuffleState;
+            private set
+            {
+                _currentShuffleState = value;
+                OnPropertyChanged();
+            }
+        }
+        public void CycleRepeat()
+        {
+            switch (CurrentRepeatState)
+            {
+                case RepeatState.Off:
+                    CurrentRepeatState = RepeatState.Repeat;
+                    break;
+                case RepeatState.Repeat:
+                    CurrentRepeatState = RepeatState.RepeatOne;
+                    break;
+                case RepeatState.RepeatOne:
+                    CurrentRepeatState = RepeatState.Off;
+                    break;
+                default:
+                    CurrentRepeatState = RepeatState.Repeat;
+                    break;
+            }
+        }
+        public void ToggleShuffle()
+        {
+            CurrentShuffleState = CurrentShuffleState == ShuffleState.Off ? ShuffleState.Shuffle : ShuffleState.Off;
+        }
+
         private AudioService()
         {
             _mediaPlayer = new MediaPlayer();
@@ -33,6 +86,7 @@ namespace Musium.Services
         }
 
         private List<Artist> Database = new List<Artist>();
+        private List<Song> Queue = new List<Song>();
         private Artist? GetArtist(string name)
         {
             foreach (Artist artist in Database)
@@ -45,21 +99,6 @@ namespace Musium.Services
             return null;
         }
 
-        public List<Song> GetAllTracks()
-        {
-            List<Song> songs = new List<Song>();
-            foreach (Artist artist in Database)
-            {
-                foreach (Album album in artist.Albums)
-                {
-                    foreach (Song song in album.Songs)
-                    {
-                        songs.Add(song);
-                    }
-                }
-            }
-            return songs;
-        }
         public async Task<List<Song>> GetAllTracksAsync()
         {
             return await Task.Run(() =>
@@ -76,6 +115,22 @@ namespace Musium.Services
                     }
                 }
                 return songs;
+            });
+        }
+
+        public async Task<List<Album>> GetAllAlbumsAsync()
+        {
+            return await Task.Run(() =>
+            {
+                List<Album> albums = new List<Album>();
+                foreach (Artist artist in Database)
+                {
+                    foreach (Album album in artist.Albums)
+                    {
+                        albums.Add(album);
+                    }
+                }
+                return albums;
             });
         }
         public void SetDispatcherQueue(DispatcherQueue newdq)
@@ -130,6 +185,21 @@ namespace Musium.Services
                 OnPropertyChanged();
             }
         }
+
+        private Album? _currentViewedAlbum;
+        public Album? CurrentViewedAlbum
+        {
+            get => _currentViewedAlbum;
+            set
+            {
+                if (_currentViewedAlbum != value)
+                {
+                    _currentViewedAlbum = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public void Pause()
         {
             _mediaPlayer?.Pause();
@@ -251,10 +321,12 @@ namespace Musium.Services
                 FilePath = path,
                 Genre = tfile.Tag.FirstGenre,
                 Duration = tfile.Properties.Duration,
+                TrackNumber = (int)tfile.Tag.Track,
                 Lossless = IsLossless(path)
             };
 
             album.Songs.Add(song);
+            album.Songs.OrderBy(song => song.TrackNumber);
 
             var pic = tfile.Tag.Pictures.ElementAtOrDefault(0);
             if (pic != null)

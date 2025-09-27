@@ -4,93 +4,77 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
+using Musium.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage.Streams;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Musium.Controls
 {
-    public sealed partial class AlbumItemControl : UserControl
+    public sealed partial class AlbumItemControl : UserControl, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        void OnPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
         public AlbumItemControl()
         {
             InitializeComponent();
         }
-        public string AlbumTitle
+        private BitmapImage? _displayedCoverArt;
+        public BitmapImage? DisplayedCoverArt
         {
-            get { return (string)GetValue(AlbumTitleProperty); }
-            set { SetValue(AlbumTitleProperty, value); }
-        }
-
-        public static readonly DependencyProperty AlbumTitleProperty =
-            DependencyProperty.Register(
-                "AlbumTitle",
-                typeof(string),
-                typeof(AlbumItemControl),
-                new PropertyMetadata("Default Title", new PropertyChangedCallback(OnAlbumTitleChanged))
-            );
-        private static void OnAlbumTitleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            AlbumItemControl control = d as AlbumItemControl;
-            if (control != null)
+            get => _displayedCoverArt;
+            set
             {
-                control.albumTitleText.Text = e.NewValue as string;
-            }
-        }
-        public string ArtistName
-        {
-            get { return (string)GetValue(ArtistNameProperty); }
-            set { SetValue(ArtistNameProperty, value); }
-        }
-
-        public static readonly DependencyProperty ArtistNameProperty =
-            DependencyProperty.Register(
-                "ArtistName",
-                typeof(string),
-                typeof(AlbumItemControl),
-                new PropertyMetadata("Default Artist", new PropertyChangedCallback(OnArtistNameChanged))
-            );
-        private static void OnArtistNameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            AlbumItemControl control = d as AlbumItemControl;
-            if (control != null)
-            {
-                control.artistNameText.Text = e.NewValue as string;
+                _displayedCoverArt = value;
+                OnPropertyChanged();
             }
         }
 
-        public ImageSource Source
+        public static readonly DependencyProperty AlbumProperty = DependencyProperty.Register(
+            "Album",
+            typeof(Album),
+            typeof(AlbumItemControl),
+            new PropertyMetadata(null, OnAlbumChanged));
+        public Album Album
         {
-            get { return (ImageSource)GetValue(SourceProperty); }
-            set { SetValue(SourceProperty, value); }
+            get => (Album)GetValue(AlbumProperty);
+            set => SetValue(AlbumProperty, value);
         }
 
-        public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register(
-                "Source",
-                typeof(ImageSource),
-                typeof(AlbumItemControl),
-                new PropertyMetadata("ms-appx:///Assets/Placeholder.png", new PropertyChangedCallback(OnSourceChanged))
-            );
-        private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static async void OnAlbumChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            AlbumItemControl control = d as AlbumItemControl;
-            if (control != null)
+            var control = d as AlbumItemControl;
+            if (control != null && control.Album?.CoverArtData is byte[] imageData)
             {
-                control.albumArtImage.Source = e.NewValue as ImageSource;
+                var stream = new InMemoryRandomAccessStream();
+                await stream.WriteAsync(imageData.AsBuffer());
+                stream.Seek(0);
+
+                var bitmapImage = new BitmapImage();
+                bitmapImage.DecodePixelWidth = 160;
+                await bitmapImage.SetSourceAsync(stream);
+
+                control.DisplayedCoverArt = bitmapImage;
             }
-        }
-        private void LayoutRoot_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            System.Diagnostics.Debug.WriteLine("album tapped!");
+            else if (control != null)
+            {
+                control.DisplayedCoverArt = null;
+            }
         }
     }
 }

@@ -29,6 +29,12 @@ namespace Musium
         {
             InitializeComponent();
 
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hwnd);
+            var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+
+            appWindow.SetIcon("Assets/Icon.ico");
+
             MainNavView = RootNavigationView;
             RootNavFrame = RootFrame;
 

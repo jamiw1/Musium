@@ -52,6 +52,7 @@
                     <DataTemplate x:DataType="models:Song">
                         <controls:TrackItemControl 
                             Song="{x:Bind}"
+                            TrackView="True"
                             Clicked="TrackItemControl_Clicked"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>

@@ -48,7 +48,7 @@ namespace Musium.Pages
             if (clickedControl != null)
             {
                 Audio.PlaySong(clickedControl.Song);
-                this.Frame.Navigate(typeof(NowPlaying));
+                Frame.Navigate(typeof(NowPlaying));
                 MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
             }
         }

@@ -17,8 +17,10 @@
     <Content Remove="Assets\Placeholder.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Assets\Icon.ico" />
     <None Remove="Controls\QueueListItemControl.xaml" />
     <None Remove="Controls\TrackItemControl.xaml" />
+    <None Remove="Pages\InnerAlbum.xaml" />
     <None Remove="Pages\NowPlaying.xaml" />
     <None Remove="Styles\GridContentStyles.xaml" />
   </ItemGroup>
@@ -51,9 +53,17 @@
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
   <ItemGroup>
+    <Content Update="Assets\Icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <None Update="Assets\Placeholder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Pages\InnerAlbum.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Pages\SettingsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Musium.Pages.InnerAlbum"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Musium.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Musium.Controls"
+    xmlns:models="using:Musium.Models"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <Style x:Key="NakedListViewItemStyle" TargetType="ListViewItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <ContentPresenter />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <ScrollView Padding="32">
+        <StackPanel Spacing="16">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Spacing="32">
+                <Grid MaxHeight="240" CornerRadius="4">
+                    <Image Source="{x:Bind DisplayedCoverArt, Mode=OneWay, TargetNullValue='/Assets/Placeholder.png'}"/>
+                </Grid>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{x:Bind Audio.CurrentViewedAlbum.Title, Mode=OneWay, TargetNullValue='Title'}" FontSize="20" FontWeight="SemiBold"/>
+                    <TextBlock Text="{x:Bind Audio.CurrentViewedAlbum.Artist.Name, Mode=OneWay, TargetNullValue='Artist'}" FontSize="16" FontWeight="Normal"/>
+                </StackPanel>
+            </StackPanel>
+            <ListView
+                ItemsSource="{x:Bind Audio.CurrentViewedAlbum.Songs}"
+                IsItemClickEnabled="False" 
+                ItemContainerStyle="{StaticResource NakedListViewItemStyle}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Song">
+                        <controls:TrackItemControl Song="{x:Bind}" Clicked="TrackItemControl_Clicked"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
+    </ScrollView>
+</Page>

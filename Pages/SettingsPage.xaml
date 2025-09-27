@@ -44,7 +44,7 @@
                 </tk:SettingsExpander.Content>
                 <tk:SettingsExpander.Items>
                     <tk:SettingsCard Header="Links" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
-                        <HyperlinkButton NavigateUri="https://github.com/jamiw1" Content="GitHub"/>
+                        <HyperlinkButton NavigateUri="https://github.com/jamiw1/Musium" Content="GitHub repository"/>
                     </tk:SettingsCard>
                 </tk:SettingsExpander.Items>
             </tk:SettingsExpander>

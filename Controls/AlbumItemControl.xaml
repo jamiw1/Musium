@@ -12,7 +12,6 @@
         Width="176"
         Padding="8"
         CornerRadius="8"
-        Tapped="LayoutRoot_Tapped"
         Background="Transparent">
 
         <StackPanel Spacing="4">
@@ -20,21 +19,20 @@
             <Frame
                 Height="160" 
                 Width="160"
-                CornerRadius="0"
-                >
-                <Image x:Name="albumArtImage" 
-                    Source="ms-appx:///Assets/Placeholder.png"/>
+                CornerRadius="4">
+                <Image x:Name="albumArtImage" Source="{x:Bind DisplayedCoverArt, Mode=OneWay, TargetNullValue='/Assets/Placeholder.png'}"/>
             </Frame>
             
 
             <TextBlock x:Name="albumTitleText" 
-                   Text="album title" 
+                   Text="{x:Bind Album.Title, Mode=OneWay, TargetNullValue='Title'}"
+                   TextTrimming="CharacterEllipsis"
                    FontWeight="Bold"/>
 
             <TextBlock x:Name="artistNameText" 
-                   Text="artist name" 
+                   Text="{x:Bind Album.Artist.Name, Mode=OneWay, TargetNullValue='Artist'}" 
+                   TextTrimming="CharacterEllipsis"
                    Foreground="Gray"/>
-
         </StackPanel>
     </Grid>
 </UserControl>

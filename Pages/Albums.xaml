@@ -7,13 +7,31 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:controls="using:Musium.Controls"
+    xmlns:models="using:Musium.Models"
     mc:Ignorable="d">
+    <Page.Resources>
+        <Style x:Key="NakedListViewItemStyle" TargetType="ListViewItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <ContentPresenter />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
 
-    <GridView Margin="16" Header="Albums" HeaderTemplate="{StaticResource StyledHeaderTemplate}">
-        <controls:AlbumItemControl AlbumTitle="Poob" ArtistName="Granded"/>
-        <controls:AlbumItemControl AlbumTitle="2" ArtistName="Drake"/>
-        <controls:AlbumItemControl AlbumTitle="Radical" ArtistName="Innocuous Tingle"/>
-        <controls:AlbumItemControl AlbumTitle="Fire Extinguisher" ArtistName="Vop drop drop"/>
-        <controls:AlbumItemControl AlbumTitle="Material goo Forture" ArtistName="Wha"/>
+    <GridView 
+        Margin="16" 
+        Header="Albums" 
+        HeaderTemplate="{StaticResource StyledHeaderTemplate}"
+        ItemsSource="{x:Bind AllAlbums}"
+        IsItemClickEnabled="True"
+        ItemClick="GridView_ItemClick">
+        <GridView.ItemTemplate>
+            <DataTemplate x:DataType="models:Album">
+                <controls:AlbumItemControl Album="{x:Bind}"/>
+            </DataTemplate>
+        </GridView.ItemTemplate>
     </GridView>
 </Page>
