@@ -24,6 +24,7 @@ using Windows.Foundation.Collections;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage.Streams;
+using System.Threading.Tasks;
 
 namespace Musium.Pages;
 
@@ -71,10 +72,8 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
             Audio.PositionChanged -= Audio_PositionChanged;
         };
     }
-    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    private async Task LoadCoverArt()
     {
-        base.OnNavigatedTo(e);
-
         if (Audio.CurrentSongPlaying is Song currentSong)
         {
             if (currentSong.Album?.CoverArtData is byte[] imageData)
@@ -91,6 +90,29 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
             }
         }
     }
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        Audio.PropertyChanged += Audio_PropertyChanged;
+        await LoadCoverArt();
+    }
+
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        base.OnNavigatedFrom(e);
+        Audio.PropertyChanged -= Audio_PropertyChanged;
+    }
+
+    private void Audio_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Audio.CurrentSongPlaying))
+        {
+            DispatcherQueue.TryEnqueue(async () =>
+            {
+                await LoadCoverArt();
+            });
+        }
+    }
     private void Audio_PositionChanged(object sender, TimeSpan newPos)
     {
         DispatcherQueue.TryEnqueue(() =>
@@ -101,8 +123,9 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
     }
     private void RewindButton_Click(object sender, RoutedEventArgs e)
     {
-
+        Audio.PreviousSong();
     }
+
 
     private void PlayButton_Click(object sender, RoutedEventArgs e)
     {
@@ -128,10 +151,15 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         }
     }
 
+    private void ForwardButton_Click(object sender, RoutedEventArgs e)
+    {
+        Audio.NextSong();
+    }
+
     private void ProgressSlider_Loaded(object sender, RoutedEventArgs e)
     {
-        ProgressSlider.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(ProgressSlider_PointerPressed), true);
-        ProgressSlider.AddHandler(UIElement.PointerReleasedEvent, new PointerEventHandler(ProgressSlider_PointerReleased), true);
+        ProgressSlider.AddHandler(PointerPressedEvent, new PointerEventHandler(ProgressSlider_PointerPressed), true);
+        ProgressSlider.AddHandler(PointerReleasedEvent, new PointerEventHandler(ProgressSlider_PointerReleased), true);
     }
 
     private bool _isUserDragging = false;
@@ -157,4 +185,6 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         Audio.ScrubTo((int)Math.Ceiling(ProgressSlider.Value));
         Audio.Resume();
     }
+
+    
 }

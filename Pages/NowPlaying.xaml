@@ -8,6 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Musium.Controls"
+    xmlns:models="using:Musium.Models"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -18,8 +19,16 @@
             <Setter Property="Height" Value="50"/>
             <Setter Property="CornerRadius" Value="50"/>
         </Style>
+        <Style x:Key="NakedListViewItemStyle" TargetType="ListViewItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <ContentPresenter />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
-
     <Grid Padding="16" ColumnSpacing="16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -27,11 +36,11 @@
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="12" MaxWidth="320">
             <Frame CornerRadius="4">
-                <Image Source="{x:Bind DisplayedCoverArt, Mode=OneWay, FallbackValue='/Assets/Placeholder.png'}" MaxWidth="320"/>
+                <Image Source="{x:Bind DisplayedCoverArt, Mode=OneWay, TargetNullValue='/Assets/Placeholder.png'}" MaxWidth="320"/>
             </Frame>
             <StackPanel Spacing="4">
-                <TextBlock Text="{x:Bind Audio.CurrentSongPlaying.Title, Mode=OneWay, FallbackValue='Nothing is playing.'}" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="{x:Bind Audio.CurrentSongPlaying.Album.Artist.Name, Mode=OneWay, FallbackValue=''}" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" FontSize="16" FontWeight="Normal"/>
+                <TextBlock Text="{x:Bind Audio.CurrentSongPlaying.Title, Mode=OneWay, TargetNullValue='Nothing is playing.'}" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="{x:Bind Audio.CurrentSongPlaying.Album.Artist.Name, Mode=OneWay, TargetNullValue=''}" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" FontSize="16" FontWeight="Normal"/>
             </StackPanel>
             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
@@ -63,7 +72,7 @@
                 <Button Style="{StaticResource PlaybackButtonStyle}" Click="PlayButton_Click">
                     <SymbolIcon Symbol="{x:Bind Audio.CurrentState, Mode=OneWay, Converter={StaticResource PlaybackStateButtonConverter}, FallbackValue=Symbol.Play}"/>
                 </Button>
-                <Button Style="{StaticResource PlaybackButtonStyle}">
+                <Button Style="{StaticResource PlaybackButtonStyle}" Click="ForwardButton_Click">
                     <FontIcon Glyph="&#xeb9d;"/>
                 </Button>
             </StackPanel>
@@ -80,27 +89,19 @@
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                 BorderThickness="1"
                 Grid.Row="1">
-                <ScrollViewer  
-                    HorizontalScrollBarVisibility="Auto"
-                    Padding="8">
-                    <StackPanel VerticalAlignment="Top">
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                        <controls:QueueListItemControl />
-                    </StackPanel>
-                </ScrollViewer>
+                <ListView
+                    ItemsSource="{x:Bind Audio.Queue}"
+                    Padding="8"
+                    IsItemClickEnabled="False"
+                    CanReorderItems="True"
+                    AllowDrop="True"
+                    ItemContainerStyle="{StaticResource NakedListViewItemStyle}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Song">
+                            <controls:QueueListItemControl Song="{x:Bind}"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </Grid>
         </Grid>
     </Grid>

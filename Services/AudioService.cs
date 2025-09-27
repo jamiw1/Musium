@@ -1,17 +1,22 @@
-﻿using Musium.Models;
-using Microsoft.UI.Dispatching;
+﻿using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Musium.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using TagLib;
+using Windows.Graphics.Imaging;
 using Windows.Media.Core;
 using Windows.Media.Playback;
-using System.Diagnostics;
+using Windows.Storage.Streams;
 
 namespace Musium.Services
 {
@@ -84,10 +89,13 @@ namespace Musium.Services
             _mediaPlayer = new MediaPlayer();
             _mediaPlayer.PlaybackSession.PositionChanged += OnPlaybackSessionChanged;
             _mediaPlayer.CurrentStateChanged += OnCurrentStateChanged;
+            _mediaPlayer.MediaEnded += OnMediaEnded;
         }
 
         private List<Artist> Database = new List<Artist>();
-        private List<Song> Queue = new List<Song>();
+
+        public ObservableCollection<Song> Queue = new ObservableCollection<Song>();
+        public List<Song> History = new List<Song>();
         private Artist? GetArtist(string name)
         {
             foreach (Artist artist in Database)
@@ -150,6 +158,56 @@ namespace Musium.Services
             {
                 CurrentState = sender.CurrentState;
             });   
+        }
+        private void OnMediaEnded(MediaPlayer sender, object args)
+        {
+            NextSong();
+        }
+
+        public void NextSong()
+        {
+            var currentSong = CurrentSongPlaying;
+
+            var songToPlay = Queue.FirstOrDefault();
+            if (songToPlay != null)
+            {
+                PlaySong(songToPlay);
+
+                dispatcherQueue.TryEnqueue(() =>
+                {
+                    History.Add(currentSong);
+                    if (History.Count > 100) // capped history at 100, dunno if people actually use it past 100 songs so make PR/issue if u do
+                    {
+                        History.RemoveAt(0);
+                    }
+                    Queue.Remove(songToPlay);
+                });
+            }
+        }
+        public void PreviousSong()
+        {
+            if (_mediaPlayer.PlaybackSession.Position.TotalMilliseconds > 3000 || History.Count <= 0) // rewind goes to previous song if done in under 3 seconds
+            {
+                ScrubTo(0);
+                return;
+            }
+
+            var currentSong = CurrentSongPlaying;
+
+            var songToPlay = History.LastOrDefault();
+            if (songToPlay != null)
+            {
+                PlaySong(songToPlay);
+
+                dispatcherQueue.TryEnqueue(() =>
+                {
+                    History.Remove(songToPlay);
+                    if (currentSong != null)
+                    {
+                        Queue.Insert(0, currentSong);
+                    }
+                });
+            }
         }
 
         private static AudioService _instance;
@@ -348,6 +406,14 @@ namespace Musium.Services
                     album.CoverArtData = System.IO.File.ReadAllBytes(jpgPath);
                 }
             }
+            Task.Run(async () =>
+            {
+                if (album.CoverArtData is byte[] imageData)
+                {
+                    byte[] resizedImageData = await ResizeImageAsync(album.CoverArtData, 320);
+                    album.CoverArtData = resizedImageData;
+                }
+            });
             return song;
         }
         private bool IsLossless(string path)
@@ -376,9 +442,108 @@ namespace Musium.Services
             foreach (string subdirectory in subdirectoryEntries)
                 await ScanDirectoryIntoLibrary(subdirectory);
         }
+
+        public async Task StartQueueFromSongAsync(Song startingSong)
+        {
+            List<Song> finalQueue = await Task.Run(async () =>
+            {
+                var allTracks = await GetAllTracksAsync();
+                int index = allTracks.FindIndex(s => s == startingSong);
+
+                if (index == -1) return new List<Song>();
+
+                int startIndex = index + 1;
+                if (startIndex < allTracks.Count)
+                {
+                    int count = allTracks.Count - startIndex;
+                    return allTracks.GetRange(startIndex, count);
+                }
+                return new List<Song>();
+            });
+
+            await UpdateQueueOnUIThreadAsync(finalQueue, startingSong);
+        }
+        private Task UpdateQueueOnUIThreadAsync(List<Song> songs, Song startingSong)
+        {
+            var tcs = new TaskCompletionSource();
+
+            dispatcherQueue.TryEnqueue(() =>
+            {
+                try
+                {
+                    Queue.Clear();
+                    foreach (var song in songs)
+                    {
+                        Queue.Add(song);
+                    }
+                    PlaySong(startingSong);
+                    tcs.SetResult();
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+
+            return tcs.Task;
+        }
+        public static async Task<byte[]> ResizeImageAsync(byte[] imageData, uint newWidth)
+        {
+            var inputStream = new InMemoryRandomAccessStream();
+            await inputStream.WriteAsync(imageData.AsBuffer());
+            inputStream.Seek(0);
+
+            var decoder = await BitmapDecoder.CreateAsync(inputStream);
+
+            var transform = new BitmapTransform()
+            {
+                ScaledWidth = newWidth,
+                ScaledHeight = (uint)((decoder.PixelHeight / (double)decoder.PixelWidth) * newWidth),
+                InterpolationMode = BitmapInterpolationMode.Fant
+            };
+
+            var pixelData = await decoder.GetPixelDataAsync(
+                BitmapPixelFormat.Rgba8,
+                BitmapAlphaMode.Straight,
+                transform,
+                ExifOrientationMode.IgnoreExifOrientation,
+                ColorManagementMode.DoNotColorManage
+            );
+
+            var outputStream = new InMemoryRandomAccessStream();
+
+            var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, outputStream);
+
+            encoder.SetPixelData(
+                BitmapPixelFormat.Rgba8,
+                BitmapAlphaMode.Straight,
+                transform.ScaledWidth,
+                transform.ScaledHeight,
+                decoder.DpiX,
+                decoder.DpiY,
+                pixelData.DetachPixelData()
+            );
+
+            await encoder.FlushAsync();
+
+            var reader = new DataReader(outputStream.GetInputStreamAt(0));
+            var bytes = new byte[outputStream.Size];
+            await reader.LoadAsync((uint)outputStream.Size);
+            reader.ReadBytes(bytes);
+
+            return bytes;
+        }
+
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (dispatcherQueue != null && !dispatcherQueue.HasThreadAccess)
+            {
+                dispatcherQueue.TryEnqueue(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
+            }
+            else
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }
