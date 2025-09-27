@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.VisualBasic;
 using Musium.Models;
 using System;
 using System.Collections.Generic;
@@ -79,10 +80,8 @@ namespace Musium.Services
                     break;
             }
         }
-        public void ToggleShuffle()
-        {
-            CurrentShuffleState = CurrentShuffleState == ShuffleState.Off ? ShuffleState.Shuffle : ShuffleState.Off;
-        }
+
+        
 
         private AudioService()
         {
@@ -93,9 +92,39 @@ namespace Musium.Services
         }
 
         private List<Artist> Database = new List<Artist>();
-
         public ObservableCollection<Song> Queue = new ObservableCollection<Song>();
+        private List<Song> _nonShuffledQueueBackup = new List<Song>();
         public List<Song> History = new List<Song>();
+        public void ToggleShuffle()
+        {
+            CurrentShuffleState = CurrentShuffleState == ShuffleState.Off ? ShuffleState.Shuffle : ShuffleState.Off;
+
+            if (CurrentShuffleState == ShuffleState.Shuffle)
+            {
+                _nonShuffledQueueBackup = new List<Song>(Queue);
+
+                var rng = new Random();
+                for (int i = Queue.Count - 1; i > 0; i--)
+                {
+                    int k = rng.Next(i + 1);
+                    Queue.Move(k, i);
+                }
+            }
+            else
+            {
+                if (_nonShuffledQueueBackup.Count > 0)
+                {
+                    Queue.Clear();
+
+                    foreach (var song in _nonShuffledQueueBackup)
+                    {
+                        Queue.Add(song);
+                    }
+                    _nonShuffledQueueBackup.Clear();
+                }
+            }
+        }
+
         private Artist? GetArtist(string name)
         {
             foreach (Artist artist in Database)

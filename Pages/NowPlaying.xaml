@@ -66,6 +66,9 @@
                     FallbackValue='0:00'}" FontSize="14" FontWeight="Light" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Grid>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+                <Button Style="{StaticResource PlaybackButtonStyle}" Click="ShuffleButton_Click">
+                    <SymbolIcon Symbol="Shuffle"/>
+                </Button>
                 <Button Style="{StaticResource PlaybackButtonStyle}" Click="RewindButton_Click">
                     <FontIcon Glyph="&#xeb9e;"/>
                 </Button>
@@ -94,8 +97,7 @@
                     Padding="8"
                     IsItemClickEnabled="False"
                     CanReorderItems="True"
-                    AllowDrop="True"
-                    ItemContainerStyle="{StaticResource NakedListViewItemStyle}">
+                    AllowDrop="True">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="models:Song">
                             <controls:QueueListItemControl Song="{x:Bind}"/>

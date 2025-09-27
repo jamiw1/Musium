@@ -87,6 +87,9 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
                 await bitmapImage.SetSourceAsync(stream);
 
                 DisplayedCoverArt = bitmapImage;
+            } else
+            {
+                DisplayedCoverArt = null;
             }
         }
     }
@@ -120,6 +123,10 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
             TimeElapsed.Text = $"{newPos:m\\:ss}";
             SongProgressValue = newPos.TotalSeconds;
         });
+    }
+    private void ShuffleButton_Click(object sender, RoutedEventArgs e)
+    {
+        Audio.ToggleShuffle();
     }
     private void RewindButton_Click(object sender, RoutedEventArgs e)
     {
