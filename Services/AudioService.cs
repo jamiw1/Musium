@@ -540,7 +540,10 @@ namespace Musium.Services
         public async void SetLibrary(string targetDirectory)
         {
             Database.Clear();
-            await ScanDirectoryIntoLibrary(targetDirectory);
+            await Task.Run(async () =>
+            {
+                await ScanDirectoryIntoLibrary(targetDirectory);
+            });
         }
 
         public async Task ScanDirectoryIntoLibrary(string targetDirectory)
