@@ -52,6 +52,13 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem 
+                    Content="Favorited"
+                    Tag="Musium.Pages.Favorited">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xEB51;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem 
                     Content="Albums"
                     Tag="Musium.Pages.Albums">
                     <NavigationViewItem.Icon>
