@@ -9,11 +9,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <converters:GetLosslessGlyph x:Key="converters:GetLosslessGlyph" />
-        <converters:DurationConverter x:Key="converters:DurationConverter" />
-        <converters:BooleanToVisibilityConverter x:Key="converters:BooleanToVisibilityConverter" />
-        <converters:InverseBooleanToVisibilityConverter x:Key="converters:InverseBooleanToVisibilityConverter" />
-        <converters:BoolGridLengthConverter x:Key="converters:BoolGridLengthConverter" />
+        <converters:GetLosslessGlyph x:Key="GetLosslessGlyph" />
+        <converters:DurationConverter x:Key="DurationConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <converters:BoolGridLengthConverter x:Key="BoolGridLengthConverter" />
     </UserControl.Resources>
 
     <Button Background="Transparent"
@@ -26,28 +26,30 @@
         <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch" ColumnSpacing="32">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="{x:Bind TrackView, Converter={StaticResource converters:BoolGridLengthConverter}, Mode=OneWay}"/>
+                <ColumnDefinition Width="{x:Bind TrackView, Converter={StaticResource BoolGridLengthConverter}, Mode=OneWay}"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="0.05*"/>
+                <ColumnDefinition Width="0.05*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0" CornerRadius="4" Height="48" Width="48" Margin="0,0,-16,0" >
-                <Image Source="{x:Bind DisplayedCoverArt, Mode=OneWay, TargetNullValue='/Assets/Placeholder.png'}" Visibility="{x:Bind TrackView, Converter={StaticResource converters:BooleanToVisibilityConverter}}"/>
-                <TextBlock Text="{x:Bind Song.TrackNumber, Mode=OneWay, TargetNullValue=''}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiLight" Visibility="{x:Bind TrackView, Converter={StaticResource converters:InverseBooleanToVisibilityConverter}}"/>
+                <Image Source="{x:Bind DisplayedCoverArt, Mode=OneWay, TargetNullValue='/Assets/Placeholder.png'}" Visibility="{x:Bind TrackView, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <TextBlock Text="{x:Bind Song.TrackNumber, Mode=OneWay, TargetNullValue=''}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiLight" Visibility="{x:Bind TrackView, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
             </Grid>
 
             <StackPanel Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                 <TextBlock Text="{x:Bind Song.Title, Mode=OneWay, TargetNullValue='Title'}" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center" TextTrimming="WordEllipsis"/>
-                <TextBlock Text="{x:Bind Song.Album.Artist.Name, Mode=OneWay, TargetNullValue='Artist'}" HorizontalAlignment="Left" VerticalAlignment="Center" TextTrimming="WordEllipsis" Visibility="{x:Bind TrackView, Converter={StaticResource converters:BooleanToVisibilityConverter}}"/>
+                <TextBlock Text="{x:Bind Song.Album.Artist.Name, Mode=OneWay, TargetNullValue='Artist'}" HorizontalAlignment="Left" VerticalAlignment="Center" TextTrimming="WordEllipsis" Visibility="{x:Bind TrackView, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </StackPanel>
 
-            <TextBlock Grid.Column="2" Text="{x:Bind Song.Album.Title, Mode=OneWay, TargetNullValue='Album'}" VerticalAlignment="Center" HorizontalAlignment="Left" TextTrimming="WordEllipsis" Visibility="{x:Bind TrackView, Converter={StaticResource converters:BooleanToVisibilityConverter}}"/>
-            <TextBlock Grid.Column="3" Text="{x:Bind Song.Genre, Mode=OneWay, TargetNullValue=''}" VerticalAlignment="Center" HorizontalAlignment="Left" TextTrimming="WordEllipsis" Visibility="{x:Bind TrackView, Converter={StaticResource converters:BooleanToVisibilityConverter}}"/>
-
-            <FontIcon Grid.Column="4" Glyph="{x:Bind Song.Lossless, Mode=OneWay, Converter={StaticResource converters:GetLosslessGlyph}}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-            <TextBlock Grid.Column="5" Text="{x:Bind Song.Duration, Mode=OneWay, Converter={StaticResource converters:DurationConverter}}" VerticalAlignment="Center" HorizontalAlignment="Right" TextTrimming="WordEllipsis"/>
+            <TextBlock Grid.Column="2" Text="{x:Bind Song.Album.Title, Mode=OneWay, TargetNullValue='Album'}" VerticalAlignment="Center" HorizontalAlignment="Left" TextTrimming="WordEllipsis" Visibility="{x:Bind TrackView, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBlock Grid.Column="3" Text="{x:Bind Song.Genre, Mode=OneWay, TargetNullValue=''}" VerticalAlignment="Center" HorizontalAlignment="Left" TextTrimming="WordEllipsis" Visibility="{x:Bind TrackView, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            
+            <FontIcon Grid.Column="4" Glyph="{x:Bind Song.Lossless, Mode=OneWay, Converter={StaticResource GetLosslessGlyph}}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            <FontIcon Grid.Column="5" Glyph="{x:Bind Song.Lossless, Mode=OneWay, Converter={StaticResource GetLosslessGlyph}}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="6" Text="{x:Bind Song.Duration, Mode=OneWay, Converter={StaticResource DurationConverter}}" VerticalAlignment="Center" HorizontalAlignment="Right" TextTrimming="WordEllipsis"/>
         </Grid>
     </Button>
 </UserControl>

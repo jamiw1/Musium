@@ -35,13 +35,15 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Frame Grid.Column="0" Width="48"/>
                 <TextBlock Grid.Column="1" Text="Track Info" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="-8,0,0,0"/>
                 <TextBlock Grid.Column="2" Text="Album" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
                 <TextBlock Grid.Column="3" Text="Genre" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
                 <TextBlock Grid.Column="4" Text="Format" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
-                <TextBlock Grid.Column="5" Text="Length" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,16,0"/>
+                <TextBlock Grid.Column="5" Text="Loved" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+                <TextBlock Grid.Column="6" Text="Length" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,16,0"/>
             </Grid>
             <ListView Grid.Row="1"
                 ItemsSource="{x:Bind AllTracks}"
