@@ -582,11 +582,23 @@ namespace Musium.Services
             PlaySong(startingSong);
         }
 
-        public async Task StartQueueFromSongAsync(Song startingSong)
+        public async Task StartQueueFromSongAsync(Song startingSong, bool favoritesOnly = false)
         {
             List<Song> finalQueue = await Task.Run(async () =>
             {
                 var allTracks = await GetAllTracksAsync();
+                if (favoritesOnly == true)
+                {
+                    var favoritedtracks = new List<Song>();
+                    foreach (Song track in allTracks)
+                    {
+                        if (track.Favorited)
+                        {
+                            favoritedtracks.Add(track);
+                        }
+                    }
+                    allTracks = favoritedtracks;
+                }
                 int index = allTracks.FindIndex(s => s == startingSong);
 
                 if (index == -1) return new List<Song>();

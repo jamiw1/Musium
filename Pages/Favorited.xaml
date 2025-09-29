@@ -6,9 +6,36 @@
     xmlns:local="using:Musium.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Musium.Controls"
+    xmlns:models="using:Musium.Models"
     mc:Ignorable="d">
 
-    <Grid>
+    <Page.Resources>
+        <Style x:Key="NakedListViewItemStyle" TargetType="ListViewItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <ContentPresenter />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
 
+    <Grid>
+        <ListView Grid.Row="1"
+            ItemsSource="{x:Bind AllFavoritedTracks}"
+            IsItemClickEnabled="False" 
+            ItemContainerStyle="{StaticResource NakedListViewItemStyle}"
+            Padding="16">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:Song">
+                    <controls:TrackItemControl 
+                        Song="{x:Bind}"
+                        TrackView="True"
+                        Clicked="TrackItemControl_Clicked"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Page>
