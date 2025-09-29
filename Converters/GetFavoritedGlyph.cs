@@ -1,0 +1,22 @@
+﻿using System;
+using Microsoft.UI.Xaml.Data;
+
+namespace Musium.Converters
+{
+    public class GetFavoritedGlyph : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is bool favorited)
+            {
+                return (favorited ? "\uEB52" : "\uEB51"); 
+            }
+            return "\uEB51";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

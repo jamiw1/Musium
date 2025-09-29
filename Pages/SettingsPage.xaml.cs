@@ -44,8 +44,8 @@ public sealed partial class SettingsPage : Page
 
     }
 
-    private void Button_Click(object sender, RoutedEventArgs e)
+    private void RescanLibrarySetting_Click(object sender, RoutedEventArgs e)
     {
-
+        SettingsService.Instance.LibraryPath = SettingsService.Instance.LibraryPath;
     }
 }

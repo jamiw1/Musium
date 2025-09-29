@@ -27,9 +27,6 @@
 
         <TitleBar Title="Musium"
             x:Name="Titlebar"
-            IsBackButtonVisible="True"
-            IsBackButtonEnabled="{x:Bind RootFrame.CanGoBack, Mode=OneWay}"
-            BackRequested="TitleBar_BackRequested"
             IsPaneToggleButtonVisible="True"
             PaneToggleRequested="TitleBar_PaneToggleRequested"
             Grid.Row="0">
@@ -49,6 +46,13 @@
                     Tag="Musium.Pages.NowPlaying">        
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="Play" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem 
+                    Content="Favorited"
+                    Tag="Musium.Pages.Favorited">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xEB51;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem 

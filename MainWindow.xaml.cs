@@ -109,14 +109,6 @@ namespace Musium
                 RootFrame.Navigate(navPageType, null, transitionInfo);
             }
         }
-        private void TitleBar_BackRequested(TitleBar sender, object args)
-        {
-            if (RootFrame.CanGoBack)
-            {
-                RootFrame.GoBack();
-                UpdateNavigationViewSelection(RootFrame.CurrentSourcePageType);
-            }
-        }
 
         private void TitleBar_PaneToggleRequested(TitleBar sender, object args)
         {
