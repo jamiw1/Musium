@@ -27,7 +27,9 @@
             ItemsSource="{x:Bind AllFavoritedTracks}"
             IsItemClickEnabled="False" 
             ItemContainerStyle="{StaticResource NakedListViewItemStyle}"
-            Padding="16">
+            Padding="16"
+            Header="Favorited"
+            HeaderTemplate="{StaticResource StyledHeaderTemplate}">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="models:Song">
                     <controls:TrackItemControl 

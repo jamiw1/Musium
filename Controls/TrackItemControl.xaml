@@ -30,9 +30,9 @@
                 <ColumnDefinition Width="{x:Bind TrackView, Converter={StaticResource BoolGridLengthConverter}, Mode=OneWay}"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="0.05*"/>
-                <ColumnDefinition Width="0.05*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="45"/>
+                <ColumnDefinition Width="40"/>
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0" CornerRadius="4" Height="48" Width="48" Margin="0,0,-16,0" >
@@ -48,9 +48,9 @@
             <TextBlock Grid.Column="2" Text="{x:Bind Song.Album.Title, Mode=OneWay, TargetNullValue='Album'}" VerticalAlignment="Center" HorizontalAlignment="Left" TextTrimming="WordEllipsis" Visibility="{x:Bind TrackView, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             <TextBlock Grid.Column="3" Text="{x:Bind Song.Genre, Mode=OneWay, TargetNullValue=''}" VerticalAlignment="Center" HorizontalAlignment="Left" TextTrimming="WordEllipsis" Visibility="{x:Bind TrackView, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             
-            <FontIcon Grid.Column="4" Glyph="{x:Bind Song.Lossless, Mode=OneWay, Converter={StaticResource GetLosslessGlyph}}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-            <Button Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Right" Click="Favorite_Click">
-                <FontIcon Glyph="{x:Bind Song.Favorited, Mode=OneWay, Converter={StaticResource GetFavoritedGlyph}}"/>
+            <FontIcon Grid.Column="4" Glyph="{x:Bind Song.Lossless, Mode=OneWay, Converter={StaticResource GetLosslessGlyph}}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
+            <Button Grid.Column="5" Background="Transparent" CornerRadius="50" VerticalAlignment="Center" HorizontalAlignment="Right" Width="45" Height="45" Click="Favorite_Click">
+                <FontIcon Glyph="{x:Bind Song.Favorited, Mode=OneWay, Converter={StaticResource GetFavoritedGlyph}}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             </Button>
             <TextBlock Grid.Column="6" Text="{x:Bind Song.Duration, Mode=OneWay, Converter={StaticResource DurationConverter}}" VerticalAlignment="Center" HorizontalAlignment="Right" TextTrimming="WordEllipsis"/>
         </Grid>
