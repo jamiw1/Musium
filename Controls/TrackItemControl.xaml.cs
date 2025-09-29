@@ -93,4 +93,8 @@ public sealed partial class TrackItemControl : UserControl, INotifyPropertyChang
     {
         Clicked?.Invoke(this, e);
     }
+    private void Favorite_Click(object sender, RoutedEventArgs e)
+    {
+        Song.Favorited = !Song.Favorited;
+    }
 }
