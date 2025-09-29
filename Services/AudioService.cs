@@ -495,6 +495,7 @@ namespace Musium.Services
                 TrackNumber = (int)tfile.Tag.Track,
                 Lossless = IsLossless(path)
             };
+            song.Favorited = song.RetrieveFavorited();
 
             album.Songs.Add(song);
             album.Songs.OrderBy(song => song.TrackNumber);

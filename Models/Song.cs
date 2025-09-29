@@ -1,7 +1,10 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using TagLib.Id3v2;
 
 namespace Musium.Models
 {
@@ -62,7 +65,7 @@ namespace Musium.Models
             }
         }
 
-        private bool _favorited;
+        private bool _favorited = false;
         public bool Favorited
         {
             get => _favorited;
@@ -70,6 +73,24 @@ namespace Musium.Models
             {
                 _favorited = value;
                 OnPropertyChanged();
+            }
+        }
+        public bool RetrieveFavorited()
+        {
+            var file = TagLib.File.Create(FilePath);
+            if (file == null) return false;
+
+            var tag = file.Tag;
+
+            switch (tag)
+            {
+                case TagLib.Id3v2.Tag id3v2tag:
+                    var frames = id3v2tag.GetFrames<UserTextInformationFrame>();
+                    var favoritedFrame = frames.FirstOrDefault(frame => frame.Description == "LOVE RATING L");
+                    if (favoritedFrame == null) return false;
+                    return true;
+                default:
+                    return false;
             }
         }
 
