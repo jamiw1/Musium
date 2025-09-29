@@ -401,6 +401,7 @@ namespace Musium.Services
             ".mp3",
             ".m4a",
             ".ogg",
+            ".opus",
             ".wma",
             ".flac",
             ".alac",

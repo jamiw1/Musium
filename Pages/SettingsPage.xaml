@@ -19,13 +19,23 @@
                 Header="Libary location"
                 Description="The directory in which Musium scans for music">
                 <tk:SettingsCard.HeaderIcon>
-                    <SymbolIcon Symbol="SyncFolder"/>
+                    <SymbolIcon Symbol="Folder"/>
                 </tk:SettingsCard.HeaderIcon>
                 <tk:SettingsCard.Content>
                     <StackPanel Orientation="Horizontal" Spacing="16">
                         <TextBlock Text="{x:Bind services:SettingsService.Instance.LibraryPath, Mode=OneWay}" VerticalAlignment="Center" MaxWidth="400"/>
                         <Button Content="Browse" Click="LibraryPathSetting_Click"/>
                     </StackPanel>
+                </tk:SettingsCard.Content>
+            </tk:SettingsCard>
+            <tk:SettingsCard 
+                Header="Rescan library"
+                Description="Rescan your library folder for new music">
+                <tk:SettingsCard.HeaderIcon>
+                    <SymbolIcon Symbol="SyncFolder"/>
+                </tk:SettingsCard.HeaderIcon>
+                <tk:SettingsCard.Content>
+                    <Button Content="Rescan" Click="RescanLibrarySetting_Click"/>
                 </tk:SettingsCard.Content>
 
             </tk:SettingsCard>

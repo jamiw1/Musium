@@ -27,9 +27,6 @@
 
         <TitleBar Title="Musium"
             x:Name="Titlebar"
-            IsBackButtonVisible="True"
-            IsBackButtonEnabled="{x:Bind RootFrame.CanGoBack, Mode=OneWay}"
-            BackRequested="TitleBar_BackRequested"
             IsPaneToggleButtonVisible="True"
             PaneToggleRequested="TitleBar_PaneToggleRequested"
             Grid.Row="0">

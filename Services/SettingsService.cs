@@ -50,22 +50,19 @@ namespace Musium.Services
             get => _libraryPath;
             set
             {
-                if (_libraryPath != value)
+                _libraryPath = value;
+                ApplicationData.Current.LocalSettings.Values["LibraryPath"] = value;
+                Audio.SetLibrary(value);
+                if (Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread() != null)
                 {
-                    _libraryPath = value;
-                    ApplicationData.Current.LocalSettings.Values["LibraryPath"] = value;
-                    Audio.SetLibrary(value);
-                    if (Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread() != null)
-                    {
-                        Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread().TryEnqueue(() =>
-                        {
-                            OnPropertyChanged();
-                        });
-                    }
-                    else
+                    Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread().TryEnqueue(() =>
                     {
                         OnPropertyChanged();
-                    }
+                    });
+                }
+                else
+                {
+                    OnPropertyChanged();
                 }
             }
         }
