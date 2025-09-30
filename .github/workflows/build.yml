@@ -42,6 +42,7 @@ jobs:
       run: msbuild "$env:Solution_Name.sln" /t:Restore /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
+      working-directory: './Musium'
 
     - name: Decode the pfx
       run: |
