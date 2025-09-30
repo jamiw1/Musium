@@ -62,8 +62,9 @@ jobs:
     - name: Get file paths
       id: get_paths
       run: |
-        $files = Get-ChildItem -Path "Packages" -Include "*.msix", "*.cer" -Recurse | Select-Object -ExpandProperty FullName
-        echo "paths=$files" >> $env:GITHUB_OUTPUT
+        $files = Get-ChildItem -Path "Packages" -Include "*.msix", "*.cer"
+        $files -join "`n" | Out-File -FilePath "$env:GITHUB_OUTPUT" -Encoding utf8 -Append
+        echo "paths-output=true" >> $env:GITHUB_OUTPUT
       shell: pwsh
 
     - name: Upload app packages and certificate
