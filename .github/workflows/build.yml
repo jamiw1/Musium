@@ -22,7 +22,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      Solution_Name: Musium
+      Solution_Name: Musium.slnx
 
     steps:
     - name: Checkout
@@ -37,7 +37,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
 
     - name: Restore the application
-      run: msbuild "$env:Solution_Name.slnx" /t:Restore /p:Configuration=$env:Configuration
+      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
       env:
         Solution_Name: Musium
         Configuration: ${{ matrix.configuration }}
