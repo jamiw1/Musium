@@ -35,10 +35,9 @@ jobs:
     
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
-    - name: List files
-      run: ls -R
+
     - name: Restore the application
-      run: msbuild "$env:Solution_Name.sln" /t:Restore /p:Configuration=$env:Configuration
+      run: msbuild "$env:Solution_Name.slnx" /t:Restore /p:Configuration=$env:Configuration
       env:
         Solution_Name: Musium
         Configuration: ${{ matrix.configuration }}
