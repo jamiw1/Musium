@@ -140,6 +140,19 @@ namespace Musium.Services
             CurrentShuffleState = newState;
             ShuffleLogic();
         }
+        private void ReplaceQueueWithCurrentUnshuffled()
+        {
+            int index = _fullCurrentSongList.FindIndex(s => s == CurrentSongPlaying);
+
+            if (index == -1) return;
+
+            int startIndex = index + 1;
+            if (startIndex <= _fullCurrentSongList.Count)
+            {
+                int count = _fullCurrentSongList.Count - startIndex;
+                ReplaceQueueWithList(_fullCurrentSongList.GetRange(startIndex, count));
+            }
+        }
 
         private void ShuffleLogic()
         {
@@ -147,20 +160,12 @@ namespace Musium.Services
             if (CurrentShuffleState == ShuffleState.Shuffle)
             {
                 shuffleSongList(songList);
+                songList.Remove(CurrentSongPlaying);
                 ReplaceQueueWithList(songList);
             }
             else
             {
-                int index = songList.FindIndex(s => s == CurrentSongPlaying);
-
-                if (index == -1) return;
-
-                int startIndex = index + 1;
-                if (startIndex < songList.Count)
-                {
-                    int count = songList.Count - startIndex;
-                    ReplaceQueueWithList(songList.GetRange(startIndex, count));
-                }
+                ReplaceQueueWithCurrentUnshuffled();
             }
         }
 
@@ -566,9 +571,10 @@ namespace Musium.Services
                 await ScanDirectoryIntoLibrary(subdirectory);
         }
 
-        public async Task PlayAlbumAsync(Song startingSong) //TODO: remake this
-        {            
-            PlaySongList(startingSong.Album.Songs, startingSong);
+        public void PlayAlbumAsync(Song startingSong) //TODO: remake this
+        {
+            PlaySongList([.. startingSong.Album.Songs], startingSong);
+            ReplaceQueueWithCurrentUnshuffled();
         }
 
         public async Task PlayTrackAsync(Song startingSong, bool favoritesOnly = false) //TODO: remake this
@@ -608,7 +614,7 @@ namespace Musium.Services
                     return new List<Song>();
                 });
 
-                await SetQueueAsync(finalQueue, startingSong);
+                //await SetQueueAsync(finalQueue, startingSong);
                 PlaySong(startingSong);
             }
             
@@ -645,12 +651,12 @@ namespace Musium.Services
             {
                 try
                 {
-                    _nonShuffledQueueBackup.Clear();
-                    foreach (var song in songs)
-                    {
-                        _nonShuffledQueueBackup.Add(song);
-                        _nonShuffledQueueBackup.Remove(startingSong);
-                    }
+                    //_nonShuffledQueueBackup.Clear();
+                    //foreach (var song in songs)
+                    //{
+                    //    _nonShuffledQueueBackup.Add(song);
+                    //    _nonShuffledQueueBackup.Remove(startingSong);
+                    //}
 
                     Queue.Clear();
                     var songsToShuffle = songs.Where(s => s != startingSong);
