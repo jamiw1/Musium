@@ -30,14 +30,14 @@ namespace Musium
         public App()
         {
             InitializeComponent();
-
-            var Audio = AudioService.Instance;
-            Audio.ScanDirectoryIntoLibrary("C:\\Users\\jamied\\Nextcloud\\Music\\Streamed");
         }
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             MainWindow = new MainWindow();
             MainWindow.Activate();
+
+            var Audio = AudioService.Instance;
+            await Audio.ScanDirectoryIntoLibrary(SettingsService.Instance.LibraryPath);
         }
     }
 }
