@@ -59,8 +59,9 @@ jobs:
     - name: Remove the pfx
       run: Remove-Item -path GitHubActionsWorkflow.pfx
 
-    - name: Upload MSIX package
+    - name: Upload app packages and certificate
       uses: actions/upload-artifact@v4
       with:
-        name: MSIX Package
-        path: ${{ github.workspace }}\\Packages
+        name: ${{ matrix.platform }}-App-Package
+        path: ${{ github.workspace }}/Packages/*.msix
+              ${{ github.workspace }}/Packages/*.cer
