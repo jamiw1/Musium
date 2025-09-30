@@ -96,7 +96,7 @@ namespace Musium.Services
 
         private List<Artist> Database = new List<Artist>();
         public ObservableCollection<Song> Queue = new ObservableCollection<Song>();
-        private List<Song> _fullCurrentSongList= new List<Song>();
+        private List<Song> _fullCurrentSongList = new List<Song>();
         public List<Song> History = new List<Song>();
 
         public void PlaySongList(List<Song> inputSongList, Song startingSong)
@@ -143,7 +143,25 @@ namespace Musium.Services
 
         private void ShuffleLogic()
         {
-            
+            var songList = new List<Song>(_fullCurrentSongList);
+            if (CurrentShuffleState == ShuffleState.Shuffle)
+            {
+                shuffleSongList(songList);
+                ReplaceQueueWithList(songList);
+            }
+            else
+            {
+                int index = songList.FindIndex(s => s == CurrentSongPlaying);
+
+                if (index == -1) return;
+
+                int startIndex = index + 1;
+                if (startIndex < songList.Count)
+                {
+                    int count = songList.Count - startIndex;
+                    ReplaceQueueWithList(songList.GetRange(startIndex, count));
+                }
+            }
         }
 
         private Artist? GetArtist(string name)
