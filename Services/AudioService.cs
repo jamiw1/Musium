@@ -571,53 +571,29 @@ namespace Musium.Services
                 await ScanDirectoryIntoLibrary(subdirectory);
         }
 
-        public void PlayAlbumAsync(Song startingSong) //TODO: remake this
+        public void PlayAlbumAsync(Song startingSong)
         {
             PlaySongList([.. startingSong.Album.Songs], startingSong);
+            if (CurrentShuffleState == ShuffleState.Shuffle) return;
             ReplaceQueueWithCurrentUnshuffled();
         }
 
-        public async Task PlayTrackAsync(Song startingSong, bool favoritesOnly = false) //TODO: remake this
+        public async Task PlayTrackAsync(Song startingSong, bool favoritesOnly = false)
         {
-            if (CurrentShuffleState == ShuffleState.Shuffle)
+            var tracks = await GetAllTracksAsync();
+            if (favoritesOnly)
             {
-                var allTracks = await GetAllTracksAsync();
-                allTracks.Remove(startingSong);
-                await StartShuffledQueueAsync(allTracks, startingSong);
-            } else
-            {
-                List<Song> finalQueue = await Task.Run(async () =>
+                foreach (Song song in tracks)
                 {
-                    var allTracks = await GetAllTracksAsync();
-                    if (favoritesOnly == true)
+                    if (song.Favorited == false)
                     {
-                        var favoritedtracks = new List<Song>();
-                        foreach (Song track in allTracks)
-                        {
-                            if (track.Favorited)
-                            {
-                                favoritedtracks.Add(track);
-                            }
-                        }
-                        allTracks = favoritedtracks;
+                        tracks.Remove(song);
                     }
-                    int index = allTracks.FindIndex(s => s == startingSong);
-
-                    if (index == -1) return new List<Song>();
-
-                    int startIndex = index + 1;
-                    if (startIndex < allTracks.Count)
-                    {
-                        int count = allTracks.Count - startIndex;
-                        return allTracks.GetRange(startIndex, count);
-                    }
-                    return new List<Song>();
-                });
-
-                //await SetQueueAsync(finalQueue, startingSong);
-                PlaySong(startingSong);
+                }
             }
-            
+            PlaySongList(tracks, startingSong);
+            if (CurrentShuffleState == ShuffleState.Shuffle) return;
+            ReplaceQueueWithCurrentUnshuffled();
         }
         //public Task SetQueueAsync(List<Song> songs, Song startingSong) //TODO: remake this
         //{
@@ -643,43 +619,6 @@ namespace Musium.Services
 
         //    return tcs.Task;
         //}
-        public Task StartShuffledQueueAsync(List<Song> songs, Song startingSong) //TODO: remake this
-        {
-            var tcs = new TaskCompletionSource();
-
-            dispatcherQueue.TryEnqueue(() =>
-            {
-                try
-                {
-                    //_nonShuffledQueueBackup.Clear();
-                    //foreach (var song in songs)
-                    //{
-                    //    _nonShuffledQueueBackup.Add(song);
-                    //    _nonShuffledQueueBackup.Remove(startingSong);
-                    //}
-
-                    Queue.Clear();
-                    var songsToShuffle = songs.Where(s => s != startingSong);
-                    var shuffledQueue = songsToShuffle.OrderBy(s => _rng.Next());
-                    foreach (var song in shuffledQueue)
-                    {
-                        Queue.Add(song);
-                    }
-
-                    PlaySong(startingSong);
-
-                    CurrentShuffleState = ShuffleState.Shuffle;
-
-                    tcs.SetResult();
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
-                }
-            });
-
-            return tcs.Task;
-        }
         public static async Task<byte[]> ResizeImageAsync(byte[] imageData, uint newWidth)
         {
             var inputStream = new InMemoryRandomAccessStream();

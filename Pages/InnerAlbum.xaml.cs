@@ -105,8 +105,8 @@ namespace Musium.Pages
             var firstSong = songs.ElementAtOrDefault(randomIndex);
             if (firstSong == null) return;
 
-            await Audio.StartShuffledQueueAsync(songs, firstSong);
-
+            Audio.PlayAlbumAsync(firstSong);
+            Audio.SetShuffle(ShuffleState.Shuffle);
             Frame.Navigate(typeof(NowPlaying));
             MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
         }
