@@ -59,19 +59,17 @@ jobs:
     - name: Remove the pfx
       run: Remove-Item -path GitHubActionsWorkflow.pfx
       
-    - name: List files
-      run: ls ${{ github.workspace }}/Packages/ -R
-      
-    - name: Upload app packages
+    - name: Get file paths
+      id: get_paths
+      run: |
+        $files = Get-ChildItem -Path "Packages" -Include "*.msix", "*.cer" -Recurse | Select-Object -ExpandProperty FullName
+        echo "paths=$files" >> $env:GITHUB_OUTPUT
+      shell: pwsh
+
+    - name: Upload app packages and certificate
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.platform }}-App-Package
-        path: ${{ github.workspace }}/Packages/*.msix
-        
-    - name: Upload certificate
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ matrix.platform }}-App-Certificate
-        path: ${{ github.workspace }}/Packages/*.cer
+        path: ${{ steps.get_paths.outputs.paths }}
         
               
