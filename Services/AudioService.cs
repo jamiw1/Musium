@@ -537,7 +537,7 @@ namespace Musium.Services
         }
         private bool IsLossless(string path)
         {
-            var extension = System.IO.Path.GetExtension(path).ToLower();
+            var extension = Path.GetExtension(path).ToLower();
             if (!audioExtensions.Contains(extension))
             {
                 return false;
@@ -566,29 +566,12 @@ namespace Musium.Services
                 await ScanDirectoryIntoLibrary(subdirectory);
         }
 
-        public async Task StartQueueFromAlbumSongAsync(Song startingSong)
-        {
-            List<Song> finalQueue = await Task.Run(async () =>
-            {
-                var albumSongs = startingSong.Album.Songs;
-                int index = albumSongs.FindIndex(s => s == startingSong);
-
-                if (index == -1) return new List<Song>();
-
-                int startIndex = index + 1;
-                if (startIndex < albumSongs.Count)
-                {
-                    int count = albumSongs.Count - startIndex;
-                    return albumSongs.GetRange(startIndex, count);
-                }
-                return new List<Song>();
-            });
-
-            await SetQueueAsync(finalQueue, startingSong);
-            PlaySong(startingSong);
+        public async Task PlayAlbumAsync(Song startingSong) //TODO: remake this
+        {            
+            PlaySongList(startingSong.Album.Songs, startingSong);
         }
 
-        public async Task StartQueueFromSongAsync(Song startingSong, bool favoritesOnly = false)
+        public async Task PlayTrackAsync(Song startingSong, bool favoritesOnly = false) //TODO: remake this
         {
             if (CurrentShuffleState == ShuffleState.Shuffle)
             {
@@ -630,31 +613,31 @@ namespace Musium.Services
             }
             
         }
-        public Task SetQueueAsync(List<Song> songs, Song startingSong)
-        {
-            var tcs = new TaskCompletionSource();
+        //public Task SetQueueAsync(List<Song> songs, Song startingSong) //TODO: remake this
+        //{
+        //    var tcs = new TaskCompletionSource();
 
-            dispatcherQueue.TryEnqueue(() =>
-            {
-                try
-                {
-                    Queue.Clear();
-                    _nonShuffledQueueBackup.Clear();
-                    foreach (var song in songs)
-                    {
-                        Queue.Add(song);
-                    }
-                    tcs.SetResult();
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
-                }
-            });
+        //    dispatcherQueue.TryEnqueue(() =>
+        //    {
+        //        try
+        //        {
+        //            Queue.Clear();
+        //            _nonShuffledQueueBackup.Clear();
+        //            foreach (var song in songs)
+        //            {
+        //                Queue.Add(song);
+        //            }
+        //            tcs.SetResult();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            tcs.SetException(ex);
+        //        }
+        //    });
 
-            return tcs.Task;
-        }
-        public Task StartShuffledQueueAsync(List<Song> songs, Song startingSong)
+        //    return tcs.Task;
+        //}
+        public Task StartShuffledQueueAsync(List<Song> songs, Song startingSong) //TODO: remake this
         {
             var tcs = new TaskCompletionSource();
 
