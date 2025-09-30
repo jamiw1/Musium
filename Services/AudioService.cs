@@ -267,7 +267,7 @@ namespace Musium.Services
             }
 
             var songToPlay = Queue.FirstOrDefault();
-            if (songToPlay != null)
+            if (songToPlay != null) // there is a song to play next
             {
                 PlaySong(songToPlay);
 
@@ -284,29 +284,13 @@ namespace Musium.Services
                     Queue.Remove(songToPlay);
                 });
             }
-            else if (CurrentRepeatState == RepeatState.Repeat)
+            else if (CurrentRepeatState == RepeatState.Repeat) // there is no song to play next and it repeat is enabled
             {
-                var fullPlaylist = new List<Song>(History);
-                if (currentSong != null)
-                {
-                    fullPlaylist.Add(currentSong);
-                }
-
-                if (!fullPlaylist.Any()) return;
-
                 dispatcherQueue.TryEnqueue(() =>
                 {
-                    Queue.Clear();
-                    History.Clear();
-                    foreach (var song in fullPlaylist)
-                    {
-                        Queue.Add(song);
-                    }
-
-                    if (CurrentShuffleState == ShuffleState.Shuffle)
-                    {
-                        ShuffleQueue();
-                    }
+                    var list = _fullCurrentSongList;
+                    if (CurrentShuffleState == ShuffleState.Shuffle) shuffleSongList(list);
+                    ReplaceQueueWithList(list);
 
                     var firstSongInNewQueue = Queue.FirstOrDefault();
                     if (firstSongInNewQueue != null)
