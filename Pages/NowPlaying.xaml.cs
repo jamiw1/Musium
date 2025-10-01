@@ -67,7 +67,7 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
 
         Audio.PositionChanged += Audio_PositionChanged;
 
-        this.Unloaded += (s, e) =>
+        Unloaded += (s, e) =>
         {
             Audio.PositionChanged -= Audio_PositionChanged;
         };

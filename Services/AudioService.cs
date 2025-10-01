@@ -19,6 +19,7 @@ using Windows.Devices.Radios;
 using Windows.Graphics.Imaging;
 using Windows.Media.Core;
 using Windows.Media.Playback;
+using Windows.Storage;
 using Windows.Storage.Streams;
 
 namespace Musium.Services
@@ -84,7 +85,7 @@ namespace Musium.Services
             }
         }
 
-        private void ApplyPendingFavorite(Song song)
+        private void ApplyPendingFavorite(Song? song)
         {
             if (song != null && song.CurrentlyAwaitingFavorite != Song.AwaitingFavorite.None)
             {
@@ -241,7 +242,6 @@ namespace Musium.Services
         }
         private void OnMediaEnded(MediaPlayer sender, object args)
         {
-            ApplyPendingFavorite(CurrentSongPlaying);
             NextSong();
         }
 
@@ -297,7 +297,7 @@ namespace Musium.Services
                     Queue.Remove(songToPlay);
                 });
             }
-            else if (CurrentRepeatState == RepeatState.Repeat) // there is no song to play next and it repeat is enabled
+            else if (CurrentRepeatState == RepeatState.Repeat) // there is no song to play next and repeat is enabled
             {
                 dispatcherQueue.TryEnqueue(() =>
                 {
@@ -311,6 +311,17 @@ namespace Musium.Services
                         PlaySong(firstSongInNewQueue);
                         Queue.Remove(firstSongInNewQueue);
                     }
+                });
+            } 
+            else
+            {
+                Debug.Print("should clear mediaplayer");
+                Task.Run(async () =>
+                {
+                    _mediaPlayer.Pause();
+                    _mediaPlayer.Source = null;
+                    await Task.Delay(1000);
+                    ApplyPendingFavorite(currentSong);
                 });
             }
         }
@@ -353,8 +364,8 @@ namespace Musium.Services
             }
         }
 
-        private Song _currentSongPlaying;
-        public Song CurrentSongPlaying
+        private Song? _currentSongPlaying;
+        public Song? CurrentSongPlaying
         {
             get => _currentSongPlaying;
             private set
@@ -407,11 +418,18 @@ namespace Musium.Services
         {
             var songThatWasPlaying = CurrentSongPlaying;
 
-            ApplyPendingFavorite(songThatWasPlaying);
-
-            _mediaPlayer.Source = MediaSource.CreateFromUri(new Uri("file:///" + song.FilePath));
             CurrentSongPlaying = song;
+            _mediaPlayer.Source = MediaSource.CreateFromUri(new Uri("file:///" + song.FilePath));
             _mediaPlayer.Play();
+
+            if (song != songThatWasPlaying)
+            {
+                Task.Run(async () =>
+                {
+                    await Task.Delay(1000);
+                    ApplyPendingFavorite(songThatWasPlaying);
+                });
+            }
         }
         public void ScrubTo(int seconds)
         {
@@ -482,7 +500,7 @@ namespace Musium.Services
                 artist = new Artist
                 {
                     Name = artistName,
-                    Albums = new List<Album>()
+                    Albums = new ObservableCollection<Album>()
                 };
                 Database.Add(artist);
             }
@@ -498,7 +516,7 @@ namespace Musium.Services
                 {
                     Title = albumName,
                     Artist = artist,
-                    Songs = new List<Song>()
+                    Songs = new ObservableCollection<Song>()
                 };
                 artist.Albums.Add(album);
             }

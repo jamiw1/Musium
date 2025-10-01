@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -18,8 +19,8 @@ namespace Musium.Models
             }
         }
 
-        private List<Album> _albums;
-        public List<Album> Albums
+        private ObservableCollection<Album> _albums;
+        public ObservableCollection<Album> Albums
         {
             get => _albums;
             set
@@ -42,7 +43,7 @@ namespace Musium.Models
 
         public Album? GetAlbum(string name)
         {
-            foreach (Album album in this.Albums)
+            foreach (Album album in Albums)
             {
                 if (album.Title == name)
                 {
