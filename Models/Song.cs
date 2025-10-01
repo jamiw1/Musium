@@ -1,15 +1,27 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
+using Musium.Services;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Windows.Devices.Radios;
+using Windows.Media.Core;
 
 namespace Musium.Models
 {
     public class Song : ObservableObject
     {
+        public readonly AudioService Audio = AudioService.Instance;
+        public enum AwaitingFavorite
+        {
+            Favorite,
+            Unfavorite,
+            None
+        }
+
+
         private string _title;
         public string Title
         {
@@ -64,7 +76,7 @@ namespace Musium.Models
                 OnPropertyChanged();
             }
         }
-
+        public AwaitingFavorite CurrentlyAwaitingFavorite = AwaitingFavorite.None;
         private bool? _favorited;
         public bool Favorited
         {
@@ -74,8 +86,16 @@ namespace Musium.Models
                 bool isInitialSet = !_favorited.HasValue;
                 if (_favorited == value) return;
 
+                if (Audio.CurrentSongPlaying == this)
+                {
+                    CurrentlyAwaitingFavorite = value ? AwaitingFavorite.Favorite : AwaitingFavorite.Unfavorite;
+                    return;
+                }
+
                 _favorited = value;
                 OnPropertyChanged();
+
+                
 
                 if (isInitialSet) return;
                 using (var file = TagLib.File.Create(FilePath))

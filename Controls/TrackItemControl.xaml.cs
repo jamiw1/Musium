@@ -109,4 +109,9 @@ public sealed partial class TrackItemControl : UserControl, INotifyPropertyChang
     {
         Audio.InsertEndOfQueue(Song);
     }
+
+    private void MenuFlyoutItemFav_Click(object sender, RoutedEventArgs e)
+    {
+        Song.Favorited = !Song.Favorited;
+    }
 }
