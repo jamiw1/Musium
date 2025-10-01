@@ -7,9 +7,11 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using Musium.Models;
+using Musium.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -24,6 +26,7 @@ namespace Musium.Controls;
 
 public sealed partial class QueueListItemControl : UserControl, INotifyPropertyChanged
 {
+    public readonly AudioService Audio = AudioService.Instance;
     public event PropertyChangedEventHandler? PropertyChanged;
     void OnPropertyChanged([CallerMemberName] string? name = null)
     {
@@ -91,5 +94,10 @@ public sealed partial class QueueListItemControl : UserControl, INotifyPropertyC
         {
             DisplayedCoverArt = null;
         }
+    }
+
+    private void RemoveQueue_Click(object sender, RoutedEventArgs e)
+    {
+        Audio.RemoveFromQueue(Song);
     }
 }
