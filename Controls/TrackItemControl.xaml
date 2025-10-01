@@ -16,9 +16,19 @@
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         <converters:BoolGridLengthConverter x:Key="BoolGridLengthConverter" />
         <MenuFlyout x:Key="contextMenu">
-            <MenuFlyoutItem Text="Add next in Queue" Tag="addNext">
+            <MenuFlyoutItem Text="Add next in Queue">
                 <MenuFlyoutItem.Icon>
-                    <SymbolIcon Symbol=""/>
+                    <SymbolIcon Symbol="Import"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Add last in Queue">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xEA52;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Favorite">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xEB51;"/>
                 </MenuFlyoutItem.Icon>
             </MenuFlyoutItem>
         </MenuFlyout>
