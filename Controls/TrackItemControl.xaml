@@ -15,6 +15,13 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         <converters:BoolGridLengthConverter x:Key="BoolGridLengthConverter" />
+        <MenuFlyout x:Key="contextMenu">
+            <MenuFlyoutItem Text="Add next in Queue" Tag="addNext">
+                <MenuFlyoutItem.Icon>
+                    <SymbolIcon Symbol=""/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
     </UserControl.Resources>
 
     <Button Background="Transparent"
@@ -22,7 +29,8 @@
         Padding="6,6,16,6"
         HorizontalAlignment="Stretch"
         HorizontalContentAlignment="Stretch"
-        Click="Button_Click">
+        Click="Button_Click"
+        ContextFlyout="{StaticResource contextMenu}">
 
         <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch" ColumnSpacing="32">
             <Grid.ColumnDefinitions>

@@ -97,4 +97,9 @@ public sealed partial class TrackItemControl : UserControl, INotifyPropertyChang
     {
         Song.Favorited = !Song.Favorited;
     }
+
+    private void Button_RightTapped(object sender, RightTappedRoutedEventArgs e)
+    {
+
+    }
 }

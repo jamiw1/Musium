@@ -21,24 +21,24 @@ using Windows.Media.Core;
 
 namespace Musium.Pages
 {
-    public sealed partial class Favorited : Page
+    public sealed partial class Favorites : Page
     {
         public readonly AudioService Audio = AudioService.Instance;
-        public ObservableCollection<Song> AllFavoritedTracks { get; } = new ObservableCollection<Song>();
-        public Favorited()
+        public ObservableCollection<Song> AllFavoriteTracks { get; } = new ObservableCollection<Song>();
+        public Favorites()
         {
             InitializeComponent();
-            Loaded += Favorited_Loaded;
+            Loaded += Favorites_Loaded;
         }
 
-        private async void Favorited_Loaded(object sender, RoutedEventArgs e)
+        private async void Favorites_Loaded(object sender, RoutedEventArgs e)
         {
             var allTracksData = await Audio.GetAllTracksAsync();
 
-            AllFavoritedTracks.Clear();
+            AllFavoriteTracks.Clear();
             foreach (Song track in allTracksData)
             {
-                if (track.Favorited) AllFavoritedTracks.Add(track);
+                if (track.Favorited) AllFavoriteTracks.Add(track);
             }
         }
 
