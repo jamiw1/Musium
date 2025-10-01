@@ -571,7 +571,7 @@ namespace Musium.Services
                 await ScanDirectoryIntoLibrary(subdirectory);
         }
 
-        public void PlayAlbumAsync(Song startingSong)
+        public void PlayAlbum(Song startingSong)
         {
             PlaySongList([.. startingSong.Album.Songs], startingSong);
             if (CurrentShuffleState == ShuffleState.Shuffle) return;
@@ -583,13 +583,7 @@ namespace Musium.Services
             var tracks = await GetAllTracksAsync();
             if (favoritesOnly)
             {
-                foreach (Song song in tracks)
-                {
-                    if (song.Favorited == false)
-                    {
-                        tracks.Remove(song);
-                    }
-                }
+                tracks = tracks.Where(song => song.Favorited).ToList();
             }
             PlaySongList(tracks, startingSong);
             if (CurrentShuffleState == ShuffleState.Shuffle) return;
