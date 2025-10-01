@@ -19,6 +19,7 @@ using Windows.Devices.Radios;
 using Windows.Graphics.Imaging;
 using Windows.Media.Core;
 using Windows.Media.Playback;
+using Windows.Storage;
 using Windows.Storage.Streams;
 
 namespace Musium.Services
@@ -83,9 +84,6 @@ namespace Musium.Services
                     break;
             }
         }
-
-        
-
         private AudioService()
         {
             _mediaPlayer = new MediaPlayer();
@@ -96,16 +94,37 @@ namespace Musium.Services
 
         private List<Artist> Database = new List<Artist>();
         public ObservableCollection<Song> Queue = new ObservableCollection<Song>();
-        private List<Song> _nonShuffledQueueBackup = new List<Song>();
+        private List<Song> _fullCurrentSongList = new List<Song>();
         public List<Song> History = new List<Song>();
 
-        public void ShuffleQueue()
+        public void PlaySongList(List<Song> inputSongList, Song startingSong)
         {
-            var rng = new Random();
-            for (int i = Queue.Count - 1; i > 0; i--)
+            bool shuffled = CurrentShuffleState == ShuffleState.Shuffle;
+            var songList = new List<Song>(inputSongList);
+            songList.Remove(startingSong);
+
+            _fullCurrentSongList = inputSongList;
+
+            if (shuffled) shuffleSongList(songList);
+            ReplaceQueueWithList(songList);
+            PlaySong(startingSong);
+        }
+        private void shuffleSongList(List<Song> list)
+        {
+            for (int i = list.Count - 1; i > 0; i--)
             {
-                int k = rng.Next(i + 1);
-                Queue.Move(k, i);
+                int k = _rng.Next(i + 1);
+                var temp = list[i];
+                list[i] = list[k];
+                list[k] = temp;
+            }
+        }
+        private void ReplaceQueueWithList(List<Song> list)
+        {
+            Queue.Clear();
+            foreach (Song song in list)
+            {
+                Queue.Add(song);
             }
         }
         public void ToggleShuffle()
@@ -119,26 +138,32 @@ namespace Musium.Services
             CurrentShuffleState = newState;
             ShuffleLogic();
         }
+        private void ReplaceQueueWithCurrentUnshuffled()
+        {
+            int index = _fullCurrentSongList.FindIndex(s => s == CurrentSongPlaying);
+
+            if (index == -1) return;
+
+            int startIndex = index + 1;
+            if (startIndex <= _fullCurrentSongList.Count)
+            {
+                int count = _fullCurrentSongList.Count - startIndex;
+                ReplaceQueueWithList(_fullCurrentSongList.GetRange(startIndex, count));
+            }
+        }
 
         private void ShuffleLogic()
         {
+            var songList = new List<Song>(_fullCurrentSongList);
             if (CurrentShuffleState == ShuffleState.Shuffle)
             {
-                _nonShuffledQueueBackup = new List<Song>(Queue);
-                ShuffleQueue();
+                shuffleSongList(songList);
+                songList.Remove(CurrentSongPlaying);
+                ReplaceQueueWithList(songList);
             }
             else
             {
-                if (_nonShuffledQueueBackup.Count > 0)
-                {
-                    Queue.Clear();
-
-                    foreach (var song in _nonShuffledQueueBackup)
-                    {
-                        Queue.Add(song);
-                    }
-                    _nonShuffledQueueBackup.Clear();
-                }
+                ReplaceQueueWithCurrentUnshuffled();
             }
         }
 
@@ -245,7 +270,7 @@ namespace Musium.Services
             }
 
             var songToPlay = Queue.FirstOrDefault();
-            if (songToPlay != null)
+            if (songToPlay != null) // there is a song to play next
             {
                 PlaySong(songToPlay);
 
@@ -262,29 +287,13 @@ namespace Musium.Services
                     Queue.Remove(songToPlay);
                 });
             }
-            else if (CurrentRepeatState == RepeatState.Repeat)
+            else if (CurrentRepeatState == RepeatState.Repeat) // there is no song to play next and repeat is enabled
             {
-                var fullPlaylist = new List<Song>(History);
-                if (currentSong != null)
-                {
-                    fullPlaylist.Add(currentSong);
-                }
-
-                if (!fullPlaylist.Any()) return;
-
                 dispatcherQueue.TryEnqueue(() =>
                 {
-                    Queue.Clear();
-                    History.Clear();
-                    foreach (var song in fullPlaylist)
-                    {
-                        Queue.Add(song);
-                    }
-
-                    if (CurrentShuffleState == ShuffleState.Shuffle)
-                    {
-                        ShuffleQueue();
-                    }
+                    var list = _fullCurrentSongList;
+                    if (CurrentShuffleState == ShuffleState.Shuffle) shuffleSongList(list);
+                    ReplaceQueueWithList(list);
 
                     var firstSongInNewQueue = Queue.FirstOrDefault();
                     if (firstSongInNewQueue != null)
@@ -334,8 +343,8 @@ namespace Musium.Services
             }
         }
 
-        private Song _currentSongPlaying;
-        public Song CurrentSongPlaying
+        private Song? _currentSongPlaying;
+        public Song? CurrentSongPlaying
         {
             get => _currentSongPlaying;
             private set
@@ -384,11 +393,26 @@ namespace Musium.Services
             element.SetMediaPlayer(_mediaPlayer);
         }
 
-        public void PlaySong(Song song)
+        private async Task<MediaSource> CreateMediaSourceFromMemoryAsync(string filePath)
         {
-            _mediaPlayer.Source = MediaSource.CreateFromUri(new Uri("file:///" + song.FilePath));
+            StorageFile file = await StorageFile.GetFileFromPathAsync(filePath);
+            IBuffer buffer = await FileIO.ReadBufferAsync(file);
+
+            var memoryStream = new InMemoryRandomAccessStream();
+            await memoryStream.WriteAsync(buffer);
+
+            memoryStream.Seek(0);
+
+            var tagFile = TagLib.File.Create(filePath);
+            var mimeType = tagFile.MimeType.ToString();
+            return MediaSource.CreateFromStream(memoryStream, mimeType);
+        }
+        public async void PlaySong(Song song)
+        {
+            var source = await CreateMediaSourceFromMemoryAsync(song.FilePath);
+            _mediaPlayer.Source = source;
             _mediaPlayer.Play();
-            
+
             CurrentSongPlaying = song;
         }
         public void ScrubTo(int seconds)
@@ -460,7 +484,7 @@ namespace Musium.Services
                 artist = new Artist
                 {
                     Name = artistName,
-                    Albums = new List<Album>()
+                    Albums = new ObservableCollection<Album>()
                 };
                 Database.Add(artist);
             }
@@ -476,7 +500,7 @@ namespace Musium.Services
                 {
                     Title = albumName,
                     Artist = artist,
-                    Songs = new List<Song>()
+                    Songs = new ObservableCollection<Song>()
                 };
                 artist.Albums.Add(album);
             }
@@ -531,7 +555,7 @@ namespace Musium.Services
         }
         private bool IsLossless(string path)
         {
-            var extension = System.IO.Path.GetExtension(path).ToLower();
+            var extension = Path.GetExtension(path).ToLower();
             if (!audioExtensions.Contains(extension))
             {
                 return false;
@@ -560,121 +584,36 @@ namespace Musium.Services
                 await ScanDirectoryIntoLibrary(subdirectory);
         }
 
-        public async Task StartQueueFromAlbumSongAsync(Song startingSong)
+        public void PlayAlbum(Song startingSong)
         {
-            List<Song> finalQueue = await Task.Run(async () =>
-            {
-                var albumSongs = startingSong.Album.Songs;
-                int index = albumSongs.FindIndex(s => s == startingSong);
-
-                if (index == -1) return new List<Song>();
-
-                int startIndex = index + 1;
-                if (startIndex < albumSongs.Count)
-                {
-                    int count = albumSongs.Count - startIndex;
-                    return albumSongs.GetRange(startIndex, count);
-                }
-                return new List<Song>();
-            });
-
-            await SetQueueAsync(finalQueue, startingSong);
-            PlaySong(startingSong);
+            PlaySongList([.. startingSong.Album.Songs], startingSong);
+            if (CurrentShuffleState == ShuffleState.Shuffle) return;
+            ReplaceQueueWithCurrentUnshuffled();
         }
 
-        public async Task StartQueueFromSongAsync(Song startingSong, bool favoritesOnly = false)
+        public async Task PlayTrackAsync(Song startingSong, bool favoritesOnly = false)
         {
-            List<Song> finalQueue = await Task.Run(async () =>
+            var tracks = await GetAllTracksAsync();
+            if (favoritesOnly)
             {
-                var allTracks = await GetAllTracksAsync();
-                if (favoritesOnly == true)
-                {
-                    var favoritedtracks = new List<Song>();
-                    foreach (Song track in allTracks)
-                    {
-                        if (track.Favorited)
-                        {
-                            favoritedtracks.Add(track);
-                        }
-                    }
-                    allTracks = favoritedtracks;
-                }
-                int index = allTracks.FindIndex(s => s == startingSong);
-
-                if (index == -1) return new List<Song>();
-
-                int startIndex = index + 1;
-                if (startIndex < allTracks.Count)
-                {
-                    int count = allTracks.Count - startIndex;
-                    return allTracks.GetRange(startIndex, count);
-                }
-                return new List<Song>();
-            });
-
-            await SetQueueAsync(finalQueue, startingSong);
-            PlaySong(startingSong);
+                tracks = tracks.Where(song => song.Favorited).ToList();
+            }
+            PlaySongList(tracks, startingSong);
+            if (CurrentShuffleState == ShuffleState.Shuffle) return;
+            ReplaceQueueWithCurrentUnshuffled();
         }
-        public Task SetQueueAsync(List<Song> songs, Song startingSong)
+
+        public void InsertStartOfQueue(Song song)
         {
-            var tcs = new TaskCompletionSource();
-
-            dispatcherQueue.TryEnqueue(() =>
-            {
-                try
-                {
-                    Queue.Clear();
-                    _nonShuffledQueueBackup.Clear();
-                    foreach (var song in songs)
-                    {
-                        Queue.Add(song);
-                    }
-                    tcs.SetResult();
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
-                }
-            });
-
-            return tcs.Task;
+            Queue.Insert(0, song);
         }
-        public Task StartShuffledQueueAsync(List<Song> songs, Song startingSong)
+        public void InsertEndOfQueue(Song song)
         {
-            var tcs = new TaskCompletionSource();
-
-            dispatcherQueue.TryEnqueue(() =>
-            {
-                try
-                {
-                    _nonShuffledQueueBackup.Clear();
-                    foreach (var song in songs)
-                    {
-                        _nonShuffledQueueBackup.Add(song);
-                        _nonShuffledQueueBackup.Remove(startingSong);
-                    }
-
-                    Queue.Clear();
-                    var songsToShuffle = songs.Where(s => s != startingSong);
-                    var shuffledQueue = songsToShuffle.OrderBy(s => _rng.Next());
-                    foreach (var song in shuffledQueue)
-                    {
-                        Queue.Add(song);
-                    }
-
-                    PlaySong(startingSong);
-
-                    CurrentShuffleState = ShuffleState.Shuffle;
-
-                    tcs.SetResult();
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
-                }
-            });
-
-            return tcs.Task;
+            Queue.Add(song);
+        }
+        public void RemoveFromQueue(Song song)
+        {
+            Queue.Remove(song);
         }
         public static async Task<byte[]> ResizeImageAsync(byte[] imageData, uint newWidth)
         {

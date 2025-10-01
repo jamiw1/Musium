@@ -43,7 +43,7 @@ namespace Musium
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(Titlebar);
 
-            UpdateNavigationViewSelection(typeof(Musium.Pages.Albums));
+            UpdateNavigationViewSelection(typeof(Musium.Pages.NowPlaying));
 
             Audio.SetDispatcherQueue(DispatcherQueue);
             Audio.SetMediaPlayer(AudioPlayerElement);

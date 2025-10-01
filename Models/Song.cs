@@ -1,10 +1,13 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
+using Musium.Services;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Windows.Devices.Radios;
+using Windows.Media.Core;
 
 namespace Musium.Models
 {
@@ -64,7 +67,6 @@ namespace Musium.Models
                 OnPropertyChanged();
             }
         }
-
         private bool? _favorited;
         public bool Favorited
         {
@@ -78,43 +80,46 @@ namespace Musium.Models
                 OnPropertyChanged();
 
                 if (isInitialSet) return;
-                using (var file = TagLib.File.Create(FilePath))
+                ApplyFavorited();
+            }
+        }
+        public void ApplyFavorited()
+        {
+            using var file = TagLib.File.Create(FilePath);
+            var loved = Favorited ? "L" : "O";
+
+            var id3v2tag = file.GetTag(TagLib.TagTypes.Id3v2) as TagLib.Id3v2.Tag;
+            if (id3v2tag != null)
+            {
+                var frames = id3v2tag.GetFrames<TagLib.Id3v2.UserTextInformationFrame>();
+                var id3v2Loved = frames.FirstOrDefault(frame => frame.Description == "LOVE RATING");
+
+                if (id3v2Loved == null)
                 {
-                    var loved = value ? "L" : "O";
-
-                    var id3v2tag = file.GetTag(TagLib.TagTypes.Id3v2) as TagLib.Id3v2.Tag;
-                    if (id3v2tag != null)
-                    {
-                        var frames = id3v2tag.GetFrames<TagLib.Id3v2.UserTextInformationFrame>();
-                        var id3v2Loved = frames.FirstOrDefault(frame => frame.Description == "LOVE RATING");
-
-                        if (id3v2Loved == null)
-                        {
-                            var newFrame = new TagLib.Id3v2.UserTextInformationFrame("LOVE RATING");
-                            newFrame.Text = [loved];
-                            id3v2tag.AddFrame(newFrame);
-                        }
-                        else
-                        {
-                            id3v2Loved.Text = [loved];
-                        }
-                    }
-
-                    var xiphcommenttag = file.GetTag(TagLib.TagTypes.Xiph) as TagLib.Ogg.XiphComment;
-                    if (xiphcommenttag != null)
-                    {
-                        xiphcommenttag.SetField("LOVE RATING", loved);
-                    }
-
-                    var mp4tag = file.GetTag(TagLib.TagTypes.Apple) as TagLib.Mpeg4.AppleTag;
-                    if (mp4tag != null)
-                    {
-                        mp4tag.SetDashBox("com.apple.iTunes", "LOVERATING", loved);
-                    }
-
-                    file.Save();
+                    var newFrame = new TagLib.Id3v2.UserTextInformationFrame("LOVE RATING");
+                    newFrame.Text = [loved];
+                    id3v2tag.AddFrame(newFrame);
+                }
+                else
+                {
+                    id3v2Loved.Text = [loved];
                 }
             }
+
+            var xiphcommenttag = file.GetTag(TagLib.TagTypes.Xiph) as TagLib.Ogg.XiphComment;
+            if (xiphcommenttag != null)
+            {
+                xiphcommenttag.SetField("LOVE RATING", loved);
+            }
+
+            var mp4tag = file.GetTag(TagLib.TagTypes.Apple) as TagLib.Mpeg4.AppleTag;
+            if (mp4tag != null)
+            {
+                mp4tag.SetDashBox("com.apple.iTunes", "LOVERATING", loved);
+            }
+
+            file.Save();
+            //Debug.WriteLine("Applied favorite (" + Favorited.ToString() + ") to song " + Title);
         }
         public bool RetrieveFavorited()
         {

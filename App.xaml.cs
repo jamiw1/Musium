@@ -20,6 +20,7 @@ using Windows.Foundation.Collections;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
+using System.Threading.Tasks;
 
 namespace Musium
 {
@@ -37,7 +38,10 @@ namespace Musium
             MainWindow.Activate();
 
             var Audio = AudioService.Instance;
-            await Audio.ScanDirectoryIntoLibrary(SettingsService.Instance.LibraryPath);
+            await Task.Run(async () =>
+            {
+                await Audio.ScanDirectoryIntoLibrary(SettingsService.Instance.LibraryPath);
+            });
         }
     }
 }

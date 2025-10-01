@@ -1,0 +1,80 @@
+using Musium.Controls;
+using Musium.Models;
+using Musium.Services;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.Media.Core;
+
+namespace Musium.Pages
+{
+    public sealed partial class Favorites : Page
+    {
+        public readonly AudioService Audio = AudioService.Instance;
+        public ObservableCollection<Song> AllFavoriteTracks { get; } = new ObservableCollection<Song>();
+
+        private readonly Random _rng = new Random();
+        public Favorites()
+        {
+            InitializeComponent();
+            Loaded += Favorites_Loaded;
+        }
+
+        private async void Favorites_Loaded(object sender, RoutedEventArgs e)
+        {
+            var allTracksData = await Audio.GetAllTracksAsync();
+
+            AllFavoriteTracks.Clear();
+            foreach (Song track in allTracksData)
+            {
+                if (track.Favorited) AllFavoriteTracks.Add(track);
+            }
+        }
+
+        private async void TrackItemControl_Clicked(object sender, RoutedEventArgs e)
+        {
+            var clickedControl = sender as TrackItemControl;
+            if (clickedControl != null)
+            {
+                await Audio.PlayTrackAsync(clickedControl.Song, true);
+                Frame.Navigate(typeof(NowPlaying));
+                MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
+            }
+        }
+
+        private async void PlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            var firstSong = AllFavoriteTracks.FirstOrDefault();
+            if (firstSong == null) return;
+            await Audio.PlayTrackAsync(firstSong, true);
+            Audio.SetShuffle(ShuffleState.Off);
+            Frame.Navigate(typeof(NowPlaying));
+            MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
+        }
+
+        private async void ShuffleButton_Click(object sender, RoutedEventArgs e)
+        {
+            var randomIndex = _rng.Next(AllFavoriteTracks.Count);
+            var firstSong = AllFavoriteTracks.ElementAtOrDefault(randomIndex);
+            if (firstSong == null) return;
+
+            await Audio.PlayTrackAsync(firstSong, true);
+            Audio.SetShuffle(ShuffleState.Shuffle);
+            Frame.Navigate(typeof(NowPlaying));
+            MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
+        }
+    }
+}

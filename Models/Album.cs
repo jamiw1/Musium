@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -7,8 +8,8 @@ namespace Musium.Models
 {
     public class Album : ObservableObject
     {
-        private List<Song> _songs;
-        public List<Song> Songs
+        private ObservableCollection<Song> _songs;
+        public ObservableCollection<Song> Songs
         {
             get => _songs;
             set

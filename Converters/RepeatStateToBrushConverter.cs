@@ -17,8 +17,7 @@ namespace Musium.Converters
         {
             if (value is RepeatState state && state != RepeatState.Off)
             {
-                var accentColor = (Color)Application.Current.Resources["SystemAccentColor"];
-                return new SolidColorBrush(accentColor);
+                return Application.Current.Resources["AccentFillColorDefaultBrush"] as SolidColorBrush;
             }
             else
             {

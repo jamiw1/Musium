@@ -21,7 +21,6 @@
     <None Remove="Controls\QueueListItemControl.xaml" />
     <None Remove="Controls\TitlebarControls.xaml" />
     <None Remove="Controls\TrackItemControl.xaml" />
-    <None Remove="Pages\Favorited.xaml" />
     <None Remove="Pages\InnerAlbum.xaml" />
     <None Remove="Pages\NowPlaying.xaml" />
     <None Remove="Styles\GridContentStyles.xaml" />
@@ -63,7 +62,7 @@
     <None Update="Assets\Placeholder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Page Update="Pages\Favorited.xaml">
+    <Page Update="Pages\Favorites.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Controls\TitlebarControls.xaml">

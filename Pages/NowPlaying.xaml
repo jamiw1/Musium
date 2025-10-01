@@ -104,7 +104,7 @@
                 <ListView
                     ItemsSource="{x:Bind Audio.Queue}"
                     Padding="8"
-                    IsItemClickEnabled="False"
+                    IsItemClickEnabled="True"
                     CanReorderItems="True"
                     AllowDrop="True">
                     <ListView.ItemTemplate>

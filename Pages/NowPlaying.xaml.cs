@@ -67,7 +67,7 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
 
         Audio.PositionChanged += Audio_PositionChanged;
 
-        this.Unloaded += (s, e) =>
+        Unloaded += (s, e) =>
         {
             Audio.PositionChanged -= Audio_PositionChanged;
         };
@@ -118,6 +118,7 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
     }
     private void Audio_PositionChanged(object sender, TimeSpan newPos)
     {
+        if (DispatcherQueue == null) return;
         DispatcherQueue.TryEnqueue(() =>
         {
             TimeElapsed.Text = $"{newPos:m\\:ss}";

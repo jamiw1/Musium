@@ -11,11 +11,11 @@ using Windows.UI;
 
 namespace Musium.Converters
 {
-    public class ShuffleStateToBrushConverter : IValueConverter
+    public class BoolToAccentBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            if (value is ShuffleState state && state == ShuffleState.Shuffle)
+            if (value is bool state && state == true)
             {
                 return Application.Current.Resources["AccentFillColorDefaultBrush"] as SolidColorBrush;
             }

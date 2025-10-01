@@ -47,7 +47,7 @@ namespace Musium.Pages
             var clickedControl = sender as TrackItemControl;
             if (clickedControl != null)
             {
-                await Audio.StartQueueFromSongAsync(clickedControl.Song);
+                await Audio.PlayTrackAsync(clickedControl.Song, false);
                 Frame.Navigate(typeof(NowPlaying));
                 MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
             }
