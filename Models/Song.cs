@@ -119,7 +119,7 @@ namespace Musium.Models
             }
 
             file.Save();
-            Debug.WriteLine("Applied favorite (" + Favorited.ToString() + ") to song " + Title);
+            //Debug.WriteLine("Applied favorite (" + Favorited.ToString() + ") to song " + Title);
         }
         public bool RetrieveFavorited()
         {
