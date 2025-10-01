@@ -27,9 +27,24 @@
             ItemsSource="{x:Bind AllFavoriteTracks}"
             IsItemClickEnabled="False" 
             ItemContainerStyle="{StaticResource NakedListViewItemStyle}"
-            Padding="16"
-            Header="Favorited"
-            HeaderTemplate="{StaticResource StyledHeaderTemplate}">
+            Padding="16">
+            <ListView.Header>
+                <StackPanel Orientation="Horizontal" Margin="0,12,0,4" Spacing="16" VerticalAlignment="Center">
+                    <TextBlock Text="Favorites" Style="{ThemeResource SubtitleTextBlockStyle}" VerticalAlignment="Center"/>
+                    <Button Click="PlayButton_Click" Style="{StaticResource AccentButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="8" Padding="2">
+                            <SymbolIcon Symbol="Play"/>
+                            <TextBlock Text="Play"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Click="ShuffleButton_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="8" Padding="2">
+                            <SymbolIcon Symbol="Shuffle"/>
+                            <TextBlock Text="Shuffle"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </ListView.Header>
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="models:Song">
                     <controls:TrackItemControl 

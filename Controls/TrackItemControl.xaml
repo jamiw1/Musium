@@ -48,7 +48,7 @@
                 <ColumnDefinition Width="{x:Bind TrackView, Converter={StaticResource BoolGridLengthConverter}, Mode=OneWay}"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="45"/>
                 <ColumnDefinition Width="40"/>
             </Grid.ColumnDefinitions>

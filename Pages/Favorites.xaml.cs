@@ -25,6 +25,8 @@ namespace Musium.Pages
     {
         public readonly AudioService Audio = AudioService.Instance;
         public ObservableCollection<Song> AllFavoriteTracks { get; } = new ObservableCollection<Song>();
+
+        private readonly Random _rng = new Random();
         public Favorites()
         {
             InitializeComponent();
@@ -51,6 +53,28 @@ namespace Musium.Pages
                 Frame.Navigate(typeof(NowPlaying));
                 MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
             }
+        }
+
+        private async void PlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            var firstSong = AllFavoriteTracks.FirstOrDefault();
+            if (firstSong == null) return;
+            await Audio.PlayTrackAsync(firstSong, true);
+            Audio.SetShuffle(ShuffleState.Off);
+            Frame.Navigate(typeof(NowPlaying));
+            MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
+        }
+
+        private async void ShuffleButton_Click(object sender, RoutedEventArgs e)
+        {
+            var randomIndex = _rng.Next(AllFavoriteTracks.Count);
+            var firstSong = AllFavoriteTracks.ElementAtOrDefault(randomIndex);
+            if (firstSong == null) return;
+
+            await Audio.PlayTrackAsync(firstSong, true);
+            Audio.SetShuffle(ShuffleState.Shuffle);
+            Frame.Navigate(typeof(NowPlaying));
+            MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
         }
     }
 }
