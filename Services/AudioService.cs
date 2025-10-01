@@ -589,30 +589,6 @@ namespace Musium.Services
             if (CurrentShuffleState == ShuffleState.Shuffle) return;
             ReplaceQueueWithCurrentUnshuffled();
         }
-        //public Task SetQueueAsync(List<Song> songs, Song startingSong) //TODO: remake this
-        //{
-        //    var tcs = new TaskCompletionSource();
-
-        //    dispatcherQueue.TryEnqueue(() =>
-        //    {
-        //        try
-        //        {
-        //            Queue.Clear();
-        //            _nonShuffledQueueBackup.Clear();
-        //            foreach (var song in songs)
-        //            {
-        //                Queue.Add(song);
-        //            }
-        //            tcs.SetResult();
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            tcs.SetException(ex);
-        //        }
-        //    });
-
-        //    return tcs.Task;
-        //}
         public static async Task<byte[]> ResizeImageAsync(byte[] imageData, uint newWidth)
         {
             var inputStream = new InMemoryRandomAccessStream();
