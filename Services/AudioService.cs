@@ -598,6 +598,10 @@ namespace Musium.Services
         {
             Queue.Add(song);
         }
+        public void RemoveFromQueue(Song song)
+        {
+            Queue.Remove(song);
+        }
         public static async Task<byte[]> ResizeImageAsync(byte[] imageData, uint newWidth)
         {
             var inputStream = new InMemoryRandomAccessStream();

@@ -15,23 +15,6 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         <converters:BoolGridLengthConverter x:Key="BoolGridLengthConverter" />
-        <MenuFlyout x:Key="contextMenu">
-            <MenuFlyoutItem Text="Play next" Click="NextQueue_Click">
-                <MenuFlyoutItem.Icon>
-                    <SymbolIcon Symbol="Import"/>
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-            <MenuFlyoutItem Text="Add to Queue" Click="LastQueue_Click">
-                <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="&#xEA52;"/>
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-            <MenuFlyoutItem Text="Favorite" Click="Favorite_Click">
-                <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="&#xEB51;"/>
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-        </MenuFlyout>
     </UserControl.Resources>
 
     <Button Background="Transparent"
@@ -39,9 +22,26 @@
         Padding="6,6,16,6"
         HorizontalAlignment="Stretch"
         HorizontalContentAlignment="Stretch"
-        Click="Button_Click"
-        ContextFlyout="{StaticResource contextMenu}">
-
+        Click="Button_Click">
+        <Button.ContextFlyout>
+            <MenuFlyout>
+                <MenuFlyoutItem Text="Play next" Click="NextQueue_Click">
+                    <MenuFlyoutItem.Icon>
+                        <SymbolIcon Symbol="Import"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Add to Queue" Click="LastQueue_Click">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xEA52;"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Favorite" Click="Favorite_Click">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="{x:Bind Song.Favorited, Mode=OneWay, Converter={StaticResource GetFavoritedGlyph}}"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+            </MenuFlyout>
+        </Button.ContextFlyout>
         <Grid VerticalAlignment="Center" HorizontalAlignment="Stretch" ColumnSpacing="32">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
