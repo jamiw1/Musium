@@ -84,16 +84,6 @@ namespace Musium.Services
                     break;
             }
         }
-
-        private void ApplyPendingFavorite(Song? song)
-        {
-            if (song != null && song.CurrentlyAwaitingFavorite != Song.AwaitingFavorite.None)
-            {
-                song.ApplyFavorited();
-                song.CurrentlyAwaitingFavorite = Song.AwaitingFavorite.None;
-            }
-        }
-
         private AudioService()
         {
             _mediaPlayer = new MediaPlayer();
@@ -312,17 +302,6 @@ namespace Musium.Services
                         Queue.Remove(firstSongInNewQueue);
                     }
                 });
-            } 
-            else
-            {
-                Debug.Print("should clear mediaplayer");
-                Task.Run(async () =>
-                {
-                    _mediaPlayer.Pause();
-                    _mediaPlayer.Source = null;
-                    await Task.Delay(1000);
-                    ApplyPendingFavorite(currentSong);
-                });
             }
         }
         public void PreviousSong()
@@ -414,22 +393,27 @@ namespace Musium.Services
             element.SetMediaPlayer(_mediaPlayer);
         }
 
-        public void PlaySong(Song song)
+        private async Task<MediaSource> CreateMediaSourceFromMemoryAsync(string filePath)
         {
-            var songThatWasPlaying = CurrentSongPlaying;
+            StorageFile file = await StorageFile.GetFileFromPathAsync(filePath);
+            IBuffer buffer = await FileIO.ReadBufferAsync(file);
 
-            CurrentSongPlaying = song;
-            _mediaPlayer.Source = MediaSource.CreateFromUri(new Uri("file:///" + song.FilePath));
+            var memoryStream = new InMemoryRandomAccessStream();
+            await memoryStream.WriteAsync(buffer);
+
+            memoryStream.Seek(0);
+
+            var tagFile = TagLib.File.Create(filePath);
+            var mimeType = tagFile.MimeType.ToString();
+            return MediaSource.CreateFromStream(memoryStream, mimeType);
+        }
+        public async void PlaySong(Song song)
+        {
+            var source = await CreateMediaSourceFromMemoryAsync(song.FilePath);
+            _mediaPlayer.Source = source;
             _mediaPlayer.Play();
 
-            if (song != songThatWasPlaying)
-            {
-                Task.Run(async () =>
-                {
-                    await Task.Delay(1000);
-                    ApplyPendingFavorite(songThatWasPlaying);
-                });
-            }
+            CurrentSongPlaying = song;
         }
         public void ScrubTo(int seconds)
         {
