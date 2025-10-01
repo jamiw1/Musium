@@ -89,8 +89,8 @@ namespace Musium.Pages
             var firstSong = Audio.CurrentViewedAlbum.Songs.FirstOrDefault();
             if (firstSong == null)
                 return;
-            Audio.SetShuffle(ShuffleState.Off);
             Audio.PlayAlbum(firstSong);
+            Audio.SetShuffle(ShuffleState.Off);
             Frame.Navigate(typeof(NowPlaying));
             MainWindow.UpdateNavigationViewSelection(typeof(NowPlaying));
         }
