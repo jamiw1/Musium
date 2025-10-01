@@ -84,7 +84,14 @@ namespace Musium.Services
             }
         }
 
-        
+        private void ApplyPendingFavorite(Song song)
+        {
+            if (song != null && song.CurrentlyAwaitingFavorite != Song.AwaitingFavorite.None)
+            {
+                song.ApplyFavorited();
+                song.CurrentlyAwaitingFavorite = Song.AwaitingFavorite.None;
+            }
+        }
 
         private AudioService()
         {
@@ -234,6 +241,7 @@ namespace Musium.Services
         }
         private void OnMediaEnded(MediaPlayer sender, object args)
         {
+            ApplyPendingFavorite(CurrentSongPlaying);
             NextSong();
         }
 
@@ -397,10 +405,13 @@ namespace Musium.Services
 
         public void PlaySong(Song song)
         {
+            var songThatWasPlaying = CurrentSongPlaying;
+
+            ApplyPendingFavorite(songThatWasPlaying);
+
             _mediaPlayer.Source = MediaSource.CreateFromUri(new Uri("file:///" + song.FilePath));
-            _mediaPlayer.Play();
-            
             CurrentSongPlaying = song;
+            _mediaPlayer.Play();
         }
         public void ScrubTo(int seconds)
         {
