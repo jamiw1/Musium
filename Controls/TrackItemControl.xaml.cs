@@ -1,4 +1,3 @@
-using Musium.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -7,6 +6,8 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
+using Musium.Models;
+using Musium.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,6 +31,8 @@ public sealed partial class TrackItemControl : UserControl, INotifyPropertyChang
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
+
+    public readonly AudioService Audio = AudioService.Instance;
 
     private BitmapImage? _displayedCoverArt;
     public BitmapImage? DisplayedCoverArt
@@ -100,10 +103,10 @@ public sealed partial class TrackItemControl : UserControl, INotifyPropertyChang
 
     private void NextQueue_Click(object sender, RoutedEventArgs e)
     {
-
+        Audio.InsertStartOfQueue(Song);
     }
     private void LastQueue_Click(object sender, RoutedEventArgs e)
     {
-
+        Audio.InsertEndOfQueue(Song);
     }
 }

@@ -589,6 +589,15 @@ namespace Musium.Services
             if (CurrentShuffleState == ShuffleState.Shuffle) return;
             ReplaceQueueWithCurrentUnshuffled();
         }
+
+        public void InsertStartOfQueue(Song song)
+        {
+            Queue.Insert(0, song);
+        }
+        public void InsertEndOfQueue(Song song)
+        {
+            Queue.Add(song);
+        }
         public static async Task<byte[]> ResizeImageAsync(byte[] imageData, uint newWidth)
         {
             var inputStream = new InMemoryRandomAccessStream();
