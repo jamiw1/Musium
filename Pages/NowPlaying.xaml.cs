@@ -118,6 +118,7 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
     }
     private void Audio_PositionChanged(object sender, TimeSpan newPos)
     {
+        if (DispatcherQueue == null) return;
         DispatcherQueue.TryEnqueue(() =>
         {
             TimeElapsed.Text = $"{newPos:m\\:ss}";

@@ -16,6 +16,8 @@
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         <converters:BoolGridLengthConverter x:Key="BoolGridLengthConverter" />
         <converters:BoolToFavoriteStringConverter x:Key="BoolToFavoriteStringConverter" />
+        <converters:BoolToAccentBrushConverter x:Key="BoolToAccentBrushConverter" />
+        
     </UserControl.Resources>
 
     <Button Background="Transparent"
@@ -69,7 +71,11 @@
             
             <FontIcon Grid.Column="4" Glyph="{x:Bind Song.Lossless, Mode=OneWay, Converter={StaticResource GetLosslessGlyph}}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5"/>
             <Button Grid.Column="5" Background="Transparent" CornerRadius="50" VerticalAlignment="Center" HorizontalAlignment="Right" Width="45" Height="45" Click="Favorite_Click">
-                <FontIcon Glyph="{x:Bind Song.Favorited, Mode=OneWay, Converter={StaticResource GetFavoritedGlyph}}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <FontIcon 
+                    Glyph="{x:Bind Song.Favorited, Mode=OneWay, Converter={StaticResource GetFavoritedGlyph}}" 
+                    Foreground="{x:Bind Song.Favorited, Mode=OneWay, Converter={StaticResource BoolToAccentBrushConverter}}"
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Center"/>
             </Button>
             <TextBlock Grid.Column="6" Text="{x:Bind Song.Duration, Mode=OneWay, Converter={StaticResource DurationConverter}}" VerticalAlignment="Center" HorizontalAlignment="Right" TextTrimming="WordEllipsis"/>
         </Grid>
