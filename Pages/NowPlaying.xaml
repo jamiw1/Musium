@@ -91,7 +91,7 @@
                     Converter={StaticResource DurationConverter},
                     FallbackValue='0:00'}" FontSize="14" FontWeight="Light" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Grid>
-            <StackPanel Orientation="Horizontal" MaxWidth="320" HorizontalAlignment="Center" HorizontalSpacing="16" VerticalSpacing="16">
+            <StackPanel Orientation="Horizontal" MaxWidth="320" HorizontalAlignment="Center" Spacing="16">
                 <Button Style="{StaticResource PlaybackButtonStyle}" Click="ShuffleButton_Click">
                     <SymbolIcon Symbol="Shuffle" Foreground="{x:Bind Audio.CurrentShuffleState, Mode=OneWay, Converter={StaticResource ShuffleStateToBrushConverter}}"/>
                 </Button>
