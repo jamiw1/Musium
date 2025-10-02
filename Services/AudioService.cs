@@ -462,8 +462,9 @@ namespace Musium.Services
                 {
                     return null;
                 }
+                var artistName = !string.IsNullOrWhiteSpace(tfile.Tag.FirstAlbumArtist) ? tfile.Tag.FirstAlbumArtist.Trim() : tfile.Tag.FirstPerformer.Trim();
 
-                var artist = GetArtistOrCreate(tfile.Tag.FirstPerformer);
+                var artist = GetArtistOrCreate(artistName);
                 var album = GetAlbumOrCreate(artist, tfile.Tag.Album);
 
                 var song = ExtractSongData(tfile, path, album);
