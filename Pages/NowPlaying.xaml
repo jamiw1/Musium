@@ -17,6 +17,8 @@
         <converters:ShuffleStateToBrushConverter x:Key="ShuffleStateToBrushConverter"/>
         <converters:RepeatStateToBrushConverter x:Key="RepeatStateToBrushConverter"/>
         <converters:RepeatStateToGlyphConverter x:Key="RepeatStateToGlyphConverter"/>
+        <converters:GetFavoritedGlyph x:Key="GetFavoritedGlyph"/>
+        <converters:BoolToAccentBrushConverter x:Key="BoolToAccentBrushConverter"/>
         
         <Style x:Key="PlaybackButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="50"/>
@@ -38,15 +40,31 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="12" MaxWidth="320">
+        <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="12">
             <Frame CornerRadius="4">
                 <Image Source="{x:Bind DisplayedCoverArt, Mode=OneWay, TargetNullValue='/Assets/Placeholder.png'}" MaxWidth="320"/>
             </Frame>
-            <StackPanel Spacing="4">
-                <TextBlock Text="{x:Bind Audio.CurrentSongPlaying.Title, Mode=OneWay, TargetNullValue='Nothing is playing.'}" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="{x:Bind Audio.CurrentSongPlaying.Album.Artist.Name, Mode=OneWay, TargetNullValue=''}" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" FontSize="16" FontWeight="Normal"/>
-            </StackPanel>
-            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
+            <RelativePanel HorizontalAlignment="Center">
+                <StackPanel x:Name="SongInfo" Spacing="4" RelativePanel.AlignHorizontalCenterWithPanel="True" MaxWidth="320">
+                    <TextBlock Text="{x:Bind Audio.CurrentSongPlaying.Title, Mode=OneWay, TargetNullValue='Nothing is playing.'}" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" FontSize="20" FontWeight="SemiBold"/>
+                    <TextBlock Text="{x:Bind Audio.CurrentSongPlaying.ArtistName, Mode=OneWay, TargetNullValue=''}" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" FontSize="16" FontWeight="Normal"/>
+                </StackPanel>
+                <Button
+                    Margin="16,0,0,0"
+                    RelativePanel.RightOf="SongInfo"
+                    RelativePanel.AlignVerticalCenterWith="SongInfo"
+                    Width="35"
+                    Height="35"
+                    Style="{StaticResource PlaybackButtonStyle}">
+                    <FontIcon 
+                        Glyph="{x:Bind Audio.CurrentSongPlaying.Favorited, Mode=OneWay, Converter={StaticResource GetFavoritedGlyph}}" 
+                        Foreground="{x:Bind Audio.CurrentSongPlaying.Favorited, Mode=OneWay, Converter={StaticResource BoolToAccentBrushConverter}}"
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Center"
+                        FontSize="10"/>
+                </Button>
+            </RelativePanel>
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" MaxWidth="320">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
