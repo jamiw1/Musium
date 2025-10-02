@@ -513,6 +513,7 @@ namespace Musium.Services
             {
                 Title = tfile.Tag.Title,
                 Album = album,
+                ArtistName = tfile.Tag.FirstPerformer,
                 FilePath = path,
                 Genre = tfile.Tag.FirstGenre,
                 Duration = tfile.Properties.Duration,

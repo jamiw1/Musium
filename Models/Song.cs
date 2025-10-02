@@ -35,6 +35,17 @@ namespace Musium.Models
             }
         }
 
+        private string _artistName;
+        public string ArtistName
+        {
+            get => _artistName;
+            set
+            {
+                _artistName = value;
+                OnPropertyChanged();
+            }
+        }
+
         private string _filePath;
         public string FilePath
         {
