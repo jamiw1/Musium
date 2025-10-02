@@ -29,7 +29,7 @@
             </Grid>
             <StackPanel>
                 <TextBlock Text="{x:Bind Song.Title, Mode=OneWay, TargetNullValue='No Song'}" FontWeight="Medium"/>
-                <TextBlock Text="{x:Bind Song.Album.Artist.Name, Mode=OneWay, TargetNullValue='No Artist'}" FontSize="12" FontWeight="Light"/>
+                <TextBlock Text="{x:Bind Song.ArtistName, Mode=OneWay, TargetNullValue='No Artist'}" FontSize="12" FontWeight="Light"/>
             </StackPanel>
         </StackPanel>
         <Grid Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Margin="0,0">
