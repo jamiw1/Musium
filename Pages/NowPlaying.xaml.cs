@@ -178,4 +178,10 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         Audio.ScrubTo((int)Math.Ceiling(ProgressSlider.Value));
         Audio.Resume();
     }
+
+    private void FavoriteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (Audio.CurrentSongPlaying == null) return;
+        Audio.CurrentSongPlaying.Favorited = !Audio.CurrentSongPlaying.Favorited;
+    }
 }

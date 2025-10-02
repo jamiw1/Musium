@@ -19,7 +19,7 @@
         <converters:RepeatStateToGlyphConverter x:Key="RepeatStateToGlyphConverter"/>
         <converters:GetFavoritedGlyph x:Key="GetFavoritedGlyph"/>
         <converters:BoolToAccentBrushConverter x:Key="BoolToAccentBrushConverter"/>
-        
+
         <Style x:Key="PlaybackButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="50"/>
             <Setter Property="Height" Value="50"/>
@@ -41,7 +41,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="12">
-            <Frame CornerRadius="4">
+            <Frame CornerRadius="4" HorizontalAlignment="Center">
                 <Image Source="{x:Bind DisplayedCoverArt, Mode=OneWay, TargetNullValue='/Assets/Placeholder.png'}" MaxWidth="320"/>
             </Frame>
             <RelativePanel HorizontalAlignment="Center">
@@ -51,17 +51,21 @@
                 </StackPanel>
                 <Button
                     Margin="16,0,0,0"
+                    Padding="0"
+                    CornerRadius="20"
                     RelativePanel.RightOf="SongInfo"
                     RelativePanel.AlignVerticalCenterWith="SongInfo"
-                    Width="35"
-                    Height="35"
-                    Style="{StaticResource PlaybackButtonStyle}">
+                    Width="40"
+                    Height="40"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    Click="FavoriteButton_Click">
                     <FontIcon 
                         Glyph="{x:Bind Audio.CurrentSongPlaying.Favorited, Mode=OneWay, Converter={StaticResource GetFavoritedGlyph}}" 
                         Foreground="{x:Bind Audio.CurrentSongPlaying.Favorited, Mode=OneWay, Converter={StaticResource BoolToAccentBrushConverter}}"
                         VerticalAlignment="Center" 
                         HorizontalAlignment="Center"
-                        FontSize="10"/>
+                        FontSize="20"/>
                 </Button>
             </RelativePanel>
             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" MaxWidth="320">
@@ -87,7 +91,7 @@
                     Converter={StaticResource DurationConverter},
                     FallbackValue='0:00'}" FontSize="14" FontWeight="Light" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Grid>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+            <StackPanel Orientation="Horizontal" MaxWidth="320" HorizontalAlignment="Center" HorizontalSpacing="16" VerticalSpacing="16">
                 <Button Style="{StaticResource PlaybackButtonStyle}" Click="ShuffleButton_Click">
                     <SymbolIcon Symbol="Shuffle" Foreground="{x:Bind Audio.CurrentShuffleState, Mode=OneWay, Converter={StaticResource ShuffleStateToBrushConverter}}"/>
                 </Button>
