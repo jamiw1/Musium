@@ -6,16 +6,31 @@
     xmlns:local="using:Musium.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:Musium.Converters"
     mc:Ignorable="d">
-
+    <Page.Resources>
+        <converters:StringFilledToVisibilityConverter x:Key="StringFilledToVisibilityConverter"/>
+    </Page.Resources>
     <ScrollView HorizontalScrollMode="Disabled">
-        <TextBlock 
-            HorizontalAlignment="Center" 
-            VerticalAlignment="Top" 
-            Text="{x:Bind Audio.CurrentSongPlaying.Lyrics, Mode=OneWay, TargetNullValue='Lyrics are unavailable for this track.'}"
-            TextAlignment="Center"
-            TextWrapping="WrapWholeWords"
-            FontSize="18"
-            Margin="32"/>
+        <StackPanel>
+            <TextBlock 
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Top" 
+                Text="Lyrics are unavailable for this track."
+                TextAlignment="Center"
+                TextWrapping="WrapWholeWords"
+                FontSize="18"
+                Margin="32"
+                Visibility="{x:Bind Audio.CurrentSongPlaying.Lyrics, Mode=OneWay, ConverterParameter='Inverse', Converter={StaticResource StringFilledToVisibilityConverter}}"/>
+            <TextBlock 
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Top" 
+                Text="{x:Bind Audio.CurrentSongPlaying.Lyrics, Mode=OneWay, TargetNullValue='This should not be visible.'}"
+                TextAlignment="Center"
+                TextWrapping="WrapWholeWords"
+                FontSize="18"
+                Margin="32"
+                Visibility="{x:Bind Audio.CurrentSongPlaying.Lyrics, Mode=OneWay, Converter={StaticResource StringFilledToVisibilityConverter}}"/>
+        </StackPanel>
     </ScrollView>
 </Page>
