@@ -50,18 +50,21 @@ namespace Musium.Pages
             {
                 case ContentDialogResult.None:
                     break;
-                case ContentDialogResult.Primary:
+                case ContentDialogResult.Primary: // online
+
                     break;
-                case ContentDialogResult.Secondary:
+                case ContentDialogResult.Secondary: // clipboard
                     var package = Clipboard.GetContent();
                     if (package.Contains(StandardDataFormats.Text))
                     {
                         if (Audio.CurrentSongPlaying == null) return;
                         var text = await package.GetTextAsync();
                         Audio.CurrentSongPlaying.Lyrics = text;
-                        Audio.CurrentSongPlaying.ApplyLyricsToFile();
+                        if (dialog.Content is AddLyricsPopup popup)
+                        {
+                            if (!popup.SessionChecked) Audio.CurrentSongPlaying.ApplyLyricsToFile();
+                        }
                     }
-
                     break;
                 default:
                     break;

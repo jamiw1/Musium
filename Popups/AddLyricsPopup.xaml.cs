@@ -23,9 +23,20 @@ namespace Musium.Popups
     /// </summary>
     public sealed partial class AddLyricsPopup : Page
     {
+        public bool SessionChecked = false;
         public AddLyricsPopup()
         {
             InitializeComponent();
+        }
+
+        private void SessionCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            SessionChecked = true;
+        }
+
+        private void SessionCheckbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            SessionChecked = false;
         }
     }
 }
