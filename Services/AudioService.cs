@@ -615,12 +615,25 @@ namespace Musium.Services
                 ArtistName = tfile.Tag.FirstPerformer,
                 FilePath = path,
                 Genre = tfile.Tag.FirstGenre,
-                Lyrics = tfile.Tag.Lyrics,
                 Duration = tfile.Properties.Duration,
                 TrackNumber = (int)tfile.Tag.Track,
                 Lossless = IsLossless(path)
             };
             song.Favorited = song.RetrieveFavorited();
+            var lyrics = tfile.Tag.Lyrics;
+            if (!string.IsNullOrWhiteSpace(lyrics))
+            {
+                song.Lyrics = lyrics;
+            } 
+            else
+            {
+                var parent = Path.GetDirectoryName(path);
+                var lrcPath = Path.Combine(parent, $"{Path.GetFileNameWithoutExtension(path)}.lrc");
+                if (System.IO.File.Exists(lrcPath))
+                {
+                    song.Lyrics = System.IO.File.ReadAllText(lrcPath);
+                }
+            }
 
             album.Songs.Add(song);
             album.Songs.OrderBy(song => song.TrackNumber);

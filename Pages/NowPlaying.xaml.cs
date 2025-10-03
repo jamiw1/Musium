@@ -121,6 +121,7 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         if (DispatcherQueue == null) return;
         DispatcherQueue.TryEnqueue(() =>
         {
+            if (TimeElapsed == null) return;
             TimeElapsed.Text = $"{newPos:m\\:ss}";
             SongProgressValue = newPos.TotalSeconds;
         });
