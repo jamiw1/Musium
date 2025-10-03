@@ -87,6 +87,7 @@ namespace Musium.Services
         private AudioService()
         {
             _mediaPlayer = new MediaPlayer();
+
             _mediaPlayer.PlaybackSession.PositionChanged += OnPlaybackSessionChanged;
             _mediaPlayer.CurrentStateChanged += OnCurrentStateChanged;
             _mediaPlayer.MediaEnded += OnMediaEnded;
@@ -350,7 +351,7 @@ namespace Musium.Services
             private set
             {
                 _currentSongPlaying = value;
-                OnPropertyChanged();
+                OnPropertyChanged();                
             }
         }
 
@@ -391,6 +392,13 @@ namespace Musium.Services
         public void SetMediaPlayer(MediaPlayerElement element)
         {
             element.SetMediaPlayer(_mediaPlayer);
+
+            var smtc = _mediaPlayer.SystemMediaTransportControls;
+            smtc.IsEnabled = true;
+            smtc.IsPlayEnabled = true;
+            smtc.IsPauseEnabled = true;
+            smtc.IsPreviousEnabled = true;
+            smtc.IsNextEnabled = true;
         }
 
         private async Task<MediaSource> CreateMediaSourceFromMemoryAsync(string filePath)
@@ -410,7 +418,27 @@ namespace Musium.Services
         public async void PlaySong(Song song)
         {
             var source = await CreateMediaSourceFromMemoryAsync(song.FilePath);
-            _mediaPlayer.Source = source;
+            var playbackItem = new MediaPlaybackItem(source);
+
+            var props = playbackItem.GetDisplayProperties();
+            props.Type = Windows.Media.MediaPlaybackType.Music;
+            props.MusicProperties.Title = song.Title;
+            props.MusicProperties.Artist = song.ArtistName;
+            using (var memoryStream = new MemoryStream(song.Album.CoverArtData ?? []))
+            {
+                var randomAccessStream = new InMemoryRandomAccessStream();
+
+                await RandomAccessStream.CopyAsync(
+                    memoryStream.AsInputStream(),
+                    randomAccessStream.GetOutputStreamAt(0) 
+                );
+
+                randomAccessStream.Seek(0);
+                props.Thumbnail = RandomAccessStreamReference.CreateFromStream(randomAccessStream);
+            }
+            playbackItem.ApplyDisplayProperties(props);
+
+            _mediaPlayer.Source = playbackItem;
             _mediaPlayer.Play();
 
             CurrentSongPlaying = song;
