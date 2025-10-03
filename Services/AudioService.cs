@@ -17,6 +17,7 @@ using TagLib;
 using TagLib.Riff;
 using Windows.Devices.Radios;
 using Windows.Graphics.Imaging;
+using Windows.Media;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
@@ -42,6 +43,7 @@ namespace Musium.Services
 
         private MediaPlayer _mediaPlayer;
         public event EventHandler<TimeSpan> PositionChanged;
+        private SystemMediaTransportControls _systemMediaTransportControls;
 
         private readonly Random _rng = new Random();
 
@@ -223,13 +225,39 @@ namespace Musium.Services
         private void OnPlaybackSessionChanged(MediaPlaybackSession sender, object args)
         {
             PositionChanged?.Invoke(this, sender.Position);
+            var timelineProperties = new SystemMediaTransportControlsTimelineProperties();
+
+            timelineProperties.StartTime = TimeSpan.FromSeconds(0);
+            timelineProperties.MinSeekTime = TimeSpan.FromSeconds(0);
+            timelineProperties.Position = sender.Position;
+            timelineProperties.MaxSeekTime = sender.NaturalDuration;
+            timelineProperties.EndTime = sender.NaturalDuration;
+
+            _systemMediaTransportControls.UpdateTimelineProperties(timelineProperties);
         }
         private void OnCurrentStateChanged(MediaPlayer sender, object args)
         {
             dispatcherQueue.TryEnqueue(() =>
             {
                 CurrentState = sender.CurrentState;
-            });   
+            });
+            switch (sender.CurrentState)
+            {
+                case MediaPlayerState.Playing:
+                    _systemMediaTransportControls.PlaybackStatus = MediaPlaybackStatus.Playing;
+                    break;
+                case MediaPlayerState.Paused:
+                    _systemMediaTransportControls.PlaybackStatus = MediaPlaybackStatus.Paused;
+                    break;
+                case MediaPlayerState.Stopped:
+                    _systemMediaTransportControls.PlaybackStatus = MediaPlaybackStatus.Stopped;
+                    break;
+                case MediaPlayerState.Closed:
+                    _systemMediaTransportControls.PlaybackStatus = MediaPlaybackStatus.Closed;
+                    break;
+                default:
+                    break;
+            }
         }
         private void OnMediaEnded(MediaPlayer sender, object args)
         {
@@ -388,17 +416,43 @@ namespace Musium.Services
         {
             _mediaPlayer?.Play();
         }
-
+        private MediaPlayerElement _element;
         public void SetMediaPlayer(MediaPlayerElement element)
         {
+            _element = element;
             element.SetMediaPlayer(_mediaPlayer);
 
-            var smtc = _mediaPlayer.SystemMediaTransportControls;
-            smtc.IsEnabled = true;
-            smtc.IsPlayEnabled = true;
-            smtc.IsPauseEnabled = true;
-            smtc.IsPreviousEnabled = true;
-            smtc.IsNextEnabled = true;
+            _systemMediaTransportControls = _mediaPlayer.SystemMediaTransportControls;
+            _mediaPlayer.CommandManager.IsEnabled = false;
+            _systemMediaTransportControls.IsPlayEnabled = true;
+            _systemMediaTransportControls.IsPauseEnabled = true;
+            _systemMediaTransportControls.IsPreviousEnabled = true;
+            _systemMediaTransportControls.IsNextEnabled = true;
+            _systemMediaTransportControls.IsFastForwardEnabled = true;
+            _systemMediaTransportControls.IsEnabled = true;
+
+            _systemMediaTransportControls.ButtonPressed += smtc_ButtonPressed;
+        }
+        private void smtc_ButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
+        {
+            switch (args.Button)
+            {
+                case SystemMediaTransportControlsButton.Next:
+                    NextSong();
+                    break;
+
+                case SystemMediaTransportControlsButton.Previous:
+                    PreviousSong();
+                    break;
+
+                case SystemMediaTransportControlsButton.Play:
+                    Resume();
+                    break;
+
+                case SystemMediaTransportControlsButton.Pause:
+                    Pause();
+                    break;
+            }
         }
 
         private async Task<MediaSource> CreateMediaSourceFromMemoryAsync(string filePath)
@@ -420,10 +474,10 @@ namespace Musium.Services
             var source = await CreateMediaSourceFromMemoryAsync(song.FilePath);
             var playbackItem = new MediaPlaybackItem(source);
 
-            var props = playbackItem.GetDisplayProperties();
-            props.Type = Windows.Media.MediaPlaybackType.Music;
-            props.MusicProperties.Title = song.Title;
-            props.MusicProperties.Artist = song.ArtistName;
+            SystemMediaTransportControlsDisplayUpdater updater = _systemMediaTransportControls.DisplayUpdater;
+            updater.Type = MediaPlaybackType.Music;
+            updater.MusicProperties.Title = song.Title;
+            updater.MusicProperties.Artist = song.ArtistName;
             using (var memoryStream = new MemoryStream(song.Album.CoverArtData ?? []))
             {
                 var randomAccessStream = new InMemoryRandomAccessStream();
@@ -434,9 +488,9 @@ namespace Musium.Services
                 );
 
                 randomAccessStream.Seek(0);
-                props.Thumbnail = RandomAccessStreamReference.CreateFromStream(randomAccessStream);
+                updater.Thumbnail = RandomAccessStreamReference.CreateFromStream(randomAccessStream);
             }
-            playbackItem.ApplyDisplayProperties(props);
+            updater.Update();
 
             _mediaPlayer.Source = playbackItem;
             _mediaPlayer.Play();
