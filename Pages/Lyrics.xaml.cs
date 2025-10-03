@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Musium.Services;
+using Musium.Popups;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,9 +31,31 @@ namespace Musium.Pages
             InitializeComponent();
         }
 
-        private void AddLyricsButton_Click(object sender, RoutedEventArgs e)
+        private async void AddLyricsButton_Click(object sender, RoutedEventArgs e)
         {
+            ContentDialog dialog = new ContentDialog();
 
+            dialog.XamlRoot = XamlRoot;
+            dialog.Title = "Add lyrics";
+            dialog.PrimaryButtonText = "Online";
+            dialog.SecondaryButtonText = "Clipboard";
+            dialog.CloseButtonText = "Cancel";
+            dialog.DefaultButton = ContentDialogButton.Primary;
+            dialog.Content = new AddLyricsPopup();
+
+            var result = await dialog.ShowAsync();
+
+            switch (result)
+            {
+                case ContentDialogResult.None:
+                    break;
+                case ContentDialogResult.Primary:
+                    break;
+                case ContentDialogResult.Secondary:
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

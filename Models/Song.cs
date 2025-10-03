@@ -78,6 +78,12 @@ namespace Musium.Models
                 OnPropertyChanged();
             }
         }
+        public void ApplyLyricsToFile()
+        {
+            using var file = TagLib.File.Create(FilePath);
+            file.Tag.Lyrics = Lyrics;
+            file.Save();
+        }
 
         private int? _trackNumber;
         public int? TrackNumber
