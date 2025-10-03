@@ -29,5 +29,10 @@ namespace Musium.Pages
         {
             InitializeComponent();
         }
+
+        private void AddLyricsButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

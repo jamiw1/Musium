@@ -12,16 +12,25 @@
         <converters:StringFilledToVisibilityConverter x:Key="StringFilledToVisibilityConverter"/>
     </Page.Resources>
     <ScrollView HorizontalScrollMode="Disabled">
-        <StackPanel>
-            <TextBlock 
-                HorizontalAlignment="Center" 
-                VerticalAlignment="Top" 
-                Text="Lyrics are unavailable for this track."
-                TextAlignment="Center"
-                TextWrapping="WrapWholeWords"
-                FontSize="18"
-                Margin="32"
-                Visibility="{x:Bind Audio.CurrentSongPlaying.Lyrics, Mode=OneWay, ConverterParameter='Inverse', Converter={StaticResource StringFilledToVisibilityConverter}}"/>
+        <StackPanel Margin="32">
+            <StackPanel
+                HorizontalAlignment="Center"
+                Spacing="12"
+                Visibility="{x:Bind Audio.CurrentSongPlaying.Lyrics, Mode=OneWay, ConverterParameter='Inverse', Converter={StaticResource StringFilledToVisibilityConverter}}">
+                <TextBlock 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Top" 
+                    Text="Lyrics are unavailable for this track."
+                    TextAlignment="Center"
+                    TextWrapping="WrapWholeWords"
+                    FontSize="18"/>
+                <Button HorizontalAlignment="Center" Padding="8" Click="AddLyricsButton_Click">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+                        <SymbolIcon Symbol="Add" VerticalAlignment="Center"/>
+                        <TextBlock Text="Add lyrics" FontSize="16"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
             <TextBlock 
                 HorizontalAlignment="Center" 
                 VerticalAlignment="Top" 
@@ -29,7 +38,6 @@
                 TextAlignment="Center"
                 TextWrapping="WrapWholeWords"
                 FontSize="18"
-                Margin="32"
                 Visibility="{x:Bind Audio.CurrentSongPlaying.Lyrics, Mode=OneWay, Converter={StaticResource StringFilledToVisibilityConverter}}"/>
         </StackPanel>
     </ScrollView>
