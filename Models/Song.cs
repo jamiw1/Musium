@@ -68,6 +68,17 @@ namespace Musium.Models
             }
         }
 
+        private string? _lyrics;
+        public string? Lyrics
+        {
+            get => _lyrics;
+            set
+            {
+                _lyrics = value;
+                OnPropertyChanged();
+            }
+        }
+
         private int? _trackNumber;
         public int? TrackNumber
         {

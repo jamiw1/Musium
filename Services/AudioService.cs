@@ -517,6 +517,7 @@ namespace Musium.Services
                 ArtistName = tfile.Tag.FirstPerformer,
                 FilePath = path,
                 Genre = tfile.Tag.FirstGenre,
+                Lyrics = tfile.Tag.Lyrics,
                 Duration = tfile.Properties.Duration,
                 TrackNumber = (int)tfile.Tag.Track,
                 Lossless = IsLossless(path)
