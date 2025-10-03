@@ -5,13 +5,14 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
-using Musium.Services;
 using Musium.Popups;
+using Musium.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -52,6 +53,15 @@ namespace Musium.Pages
                 case ContentDialogResult.Primary:
                     break;
                 case ContentDialogResult.Secondary:
+                    var package = Clipboard.GetContent();
+                    if (package.Contains(StandardDataFormats.Text))
+                    {
+                        if (Audio.CurrentSongPlaying == null) return;
+                        var text = await package.GetTextAsync();
+                        Audio.CurrentSongPlaying.Lyrics = text;
+                        Audio.CurrentSongPlaying.ApplyLyricsToFile();
+                    }
+
                     break;
                 default:
                     break;
