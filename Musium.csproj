@@ -22,6 +22,7 @@
     <None Remove="Controls\TitlebarControls.xaml" />
     <None Remove="Controls\TrackItemControl.xaml" />
     <None Remove="Pages\InnerAlbum.xaml" />
+    <None Remove="Pages\Lyrics.xaml" />
     <None Remove="Pages\NowPlaying.xaml" />
     <None Remove="Pages\Queue.xaml" />
     <None Remove="Styles\GridContentStyles.xaml" />
@@ -64,6 +65,9 @@
     <None Update="Assets\Placeholder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Pages\Lyrics.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Pages\Queue.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

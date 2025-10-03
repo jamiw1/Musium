@@ -119,8 +119,16 @@
             <SelectorBar x:Name="SecondPanelSelectorBar"
                 SelectionChanged="SecondPanelSelectorBar_SelectionChanged"
                 Grid.Row="0">
-                <SelectorBarItem x:Name="SelectorBarItemQueue" Text="Queue" IsSelected="True" />
-                <SelectorBarItem x:Name="SelectorBarItemLyrics" Text="Lyrics" />
+                <SelectorBarItem x:Name="SelectorBarItemQueue" Text="Queue" IsSelected="True">
+                    <SelectorBarItem.Icon>
+                        <FontIcon Glyph="&#xEA42;" />
+                    </SelectorBarItem.Icon>
+                </SelectorBarItem>
+                <SelectorBarItem x:Name="SelectorBarItemLyrics" Text="Lyrics">
+                    <SelectorBarItem.Icon>
+                        <FontIcon Glyph="&#xED1E;" />
+                    </SelectorBarItem.Icon>
+                </SelectorBarItem>
             </SelectorBar>
             <Frame x:Name="ContentFrame" 
                 IsNavigationStackEnabled="False" 

@@ -37,7 +37,6 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
     public AudioService Audio { get; } = AudioService.Instance;
-    private bool _mouseDown;
 
     public float CurrentTimeStamp { get; set; }
     private BitmapImage? _displayedCoverArt;
@@ -198,7 +197,7 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
                 pageType = typeof(Queue);
                 break;
             default:
-                pageType = typeof(Queue);
+                pageType = typeof(Lyrics);
                 break;
         }
 
