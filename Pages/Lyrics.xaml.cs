@@ -58,8 +58,17 @@ namespace Musium.Pages
 
                     var requestUrl = $"get?artist_name={artist}&track_name={track}&album_name={album}&duration={duration}";
 
-                    var response = await App.LyricHttpClient.GetFromJsonAsync<LyricResult?>(requestUrl);
-
+                    LyricResult? response = null;
+                    HttpStatusCode? code = null;
+                    try
+                    {
+                        response = await App.LyricHttpClient.GetFromJsonAsync<LyricResult?>(requestUrl);
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        Console.WriteLine($"api request for lyrics failed: {ex.StatusCode}");
+                        code = ex.StatusCode;
+                    }
 
                     if (response?.plainLyrics is string lyrics)
                     {
@@ -97,12 +106,21 @@ namespace Musium.Pages
                         ContentDialog confirmDialog = new ContentDialog();
 
                         confirmDialog.XamlRoot = XamlRoot;
-                        confirmDialog.Title = response?.code == 404 ? "Lyrics unavailable" : "No connection";
-                        confirmDialog.CloseButtonText = "No";
+                        confirmDialog.Title = code switch
+                        {
+                            HttpStatusCode.NotFound => "Lyrics unavailable",
+
+                            HttpStatusCode.RequestTimeout => "No connection",
+                            HttpStatusCode.ServiceUnavailable => "No connection",
+                            HttpStatusCode.GatewayTimeout => "No connection",
+
+                            _ => "Lyrics unavailable"
+                        };
+                        confirmDialog.CloseButtonText = ":(";
                         confirmDialog.DefaultButton = ContentDialogButton.Close;
                         confirmDialog.Content = new ConfirmLyricsPopup();
                         ConfirmLyricsPopup content = (ConfirmLyricsPopup)confirmDialog.Content;
-                        if (response?.code == 404) content.SetContent("Couldn't find the song on the server.");
+                        if (code == HttpStatusCode.NotFound) content.SetContent("Couldn't find the song on the server.");
 
                         await confirmDialog.ShowAsync();
                     }
