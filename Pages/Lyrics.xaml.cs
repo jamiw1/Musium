@@ -120,7 +120,6 @@ namespace Musium.Pages
                         confirmDialog.DefaultButton = ContentDialogButton.Close;
                         confirmDialog.Content = new ConfirmLyricsPopup();
                         ConfirmLyricsPopup content = (ConfirmLyricsPopup)confirmDialog.Content;
-                        if (code == HttpStatusCode.NotFound) content.SetContent("Couldn't find the song on the server.");
 
                         await confirmDialog.ShowAsync();
                     }

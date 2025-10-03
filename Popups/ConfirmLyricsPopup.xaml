@@ -9,6 +9,6 @@
     mc:Ignorable="d">
 
     <ScrollView VerticalAlignment="Stretch" HorizontalAlignment="Stretch" MaxHeight="400">
-        <TextBlock x:Name="LyricText" Text="Couldn't connect to the lyric server. :(" TextWrapping="Wrap" />
+        <TextBlock x:Name="LyricText" Text="Couldn't get the song from the server. :p" TextWrapping="Wrap" />
     </ScrollView>
 </Page>
