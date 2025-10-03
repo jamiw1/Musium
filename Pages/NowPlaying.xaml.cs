@@ -184,4 +184,9 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         if (Audio.CurrentSongPlaying == null) return;
         Audio.CurrentSongPlaying.Favorited = !Audio.CurrentSongPlaying.Favorited;
     }
+
+    private void SecondPanelSelectorBar_SelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
+    {
+
+    }
 }

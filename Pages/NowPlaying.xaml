@@ -116,7 +116,11 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Queue" FontSize="20" FontWeight="SemiBold" Grid.Row="0"/>
+            <SelectorBar x:Name="SecondPanelSelectorBar" SelectionChanged="SecondPanelSelectorBar_SelectionChanged">
+                <SelectorBarItem x:Name="SelectorBarItemQueue" Text="Queue" IsSelected="True" />
+                <SelectorBarItem x:Name="SelectorBarItemLyrics" Text="Lyrics" />
+            </SelectorBar>
+
             <Grid
                 CornerRadius="4" 
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
