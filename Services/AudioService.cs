@@ -221,19 +221,22 @@ namespace Musium.Services
             dispatcherQueue = newdq;
         }
         
-
-        private void OnPlaybackSessionChanged(MediaPlaybackSession sender, object args)
+        private void UpdateSystemTimeline()
         {
-            PositionChanged?.Invoke(this, sender.Position);
             var timelineProperties = new SystemMediaTransportControlsTimelineProperties();
 
             timelineProperties.StartTime = TimeSpan.FromSeconds(0);
             timelineProperties.MinSeekTime = TimeSpan.FromSeconds(0);
-            timelineProperties.Position = sender.Position;
-            timelineProperties.MaxSeekTime = sender.NaturalDuration;
-            timelineProperties.EndTime = sender.NaturalDuration;
+            timelineProperties.Position = _mediaPlayer.PlaybackSession.Position;
+            timelineProperties.MaxSeekTime = _mediaPlayer.PlaybackSession.NaturalDuration;
+            timelineProperties.EndTime = _mediaPlayer.PlaybackSession.NaturalDuration;
 
             _systemMediaTransportControls.UpdateTimelineProperties(timelineProperties);
+        }
+        private void OnPlaybackSessionChanged(MediaPlaybackSession sender, object args)
+        {
+            PositionChanged?.Invoke(this, sender.Position);
+            UpdateSystemTimeline();
         }
         private void OnCurrentStateChanged(MediaPlayer sender, object args)
         {
@@ -258,6 +261,7 @@ namespace Musium.Services
                 default:
                     break;
             }
+            UpdateSystemTimeline();
         }
         private void OnMediaEnded(MediaPlayer sender, object args)
         {
@@ -428,8 +432,10 @@ namespace Musium.Services
             _systemMediaTransportControls.IsPauseEnabled = true;
             _systemMediaTransportControls.IsPreviousEnabled = true;
             _systemMediaTransportControls.IsNextEnabled = true;
+            _systemMediaTransportControls.IsRewindEnabled = true;
             _systemMediaTransportControls.IsFastForwardEnabled = true;
             _systemMediaTransportControls.IsEnabled = true;
+
 
             _systemMediaTransportControls.ButtonPressed += smtc_ButtonPressed;
         }
