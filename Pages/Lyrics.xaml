@@ -12,7 +12,7 @@
         <TextBlock 
             HorizontalAlignment="Center" 
             VerticalAlignment="Top" 
-            Text="{x:Bind Audio.CurrentSongPlaying.Lyrics, Mode=OneWay, TargetNullValue='Lyrics are unavailble for this track.'}"
+            Text="{x:Bind Audio.CurrentSongPlaying.Lyrics, Mode=OneWay, TargetNullValue='Lyrics are unavailable for this track.'}"
             TextAlignment="Center"
             TextWrapping="WrapWholeWords"
             FontSize="18"
