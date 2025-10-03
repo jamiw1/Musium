@@ -654,12 +654,16 @@ namespace Musium.Services
             return losslessAudioExtensions.Contains(extension);
         }
 
+        private bool _currentlyScanning = false;
         public async void SetLibrary(string targetDirectory)
         {
+            if (_currentlyScanning) return;
+            _currentlyScanning = true;
             Database.Clear();
             await Task.Run(async () =>
             {
                 await ScanDirectoryIntoLibrary(targetDirectory);
+                _currentlyScanning = false;
             });
         }
 
