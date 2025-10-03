@@ -116,30 +116,19 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <SelectorBar x:Name="SecondPanelSelectorBar" SelectionChanged="SecondPanelSelectorBar_SelectionChanged">
+            <SelectorBar x:Name="SecondPanelSelectorBar"
+                SelectionChanged="SecondPanelSelectorBar_SelectionChanged"
+                Grid.Row="0">
                 <SelectorBarItem x:Name="SelectorBarItemQueue" Text="Queue" IsSelected="True" />
                 <SelectorBarItem x:Name="SelectorBarItemLyrics" Text="Lyrics" />
             </SelectorBar>
-
-            <Grid
+            <Frame x:Name="ContentFrame" 
+                IsNavigationStackEnabled="False" 
+                Grid.Row="1"
                 CornerRadius="4" 
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1"
-                Grid.Row="1">
-                <ListView
-                    ItemsSource="{x:Bind Audio.Queue}"
-                    Padding="8"
-                    IsItemClickEnabled="True"
-                    CanReorderItems="True"
-                    AllowDrop="True">
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="models:Song">
-                            <controls:QueueListItemControl Song="{x:Bind}"/>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
+                BorderThickness="1"/>
         </Grid>
     </Grid>
 </Page>
