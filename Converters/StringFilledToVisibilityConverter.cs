@@ -17,7 +17,6 @@ namespace Musium.Converters
                 {
                     isFilled = !isFilled;
                 }
-                if (isFilled) Debug.WriteLine(s + " - should be lyrics before");
 
                 return isFilled ? Visibility.Visible : Visibility.Collapsed;
             }

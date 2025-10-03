@@ -36,6 +36,16 @@ namespace Musium.Services
         Off,
         Shuffle
     }
+    public record class LyricResult(
+        int? code = null,
+        int? id = null,
+        string? trackName = null,
+        string? artistName = null,
+        string? albumName = null,
+        float? duration = null,
+        bool? instrumental = null,
+        string? plainLyrics = null,
+        string? syncedLyrics = null);
     public class AudioService : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
