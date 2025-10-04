@@ -50,7 +50,7 @@
                     <ImageIcon Source="/Assets/Icon.ico"/>
                 </tk:SettingsExpander.HeaderIcon>
                 <tk:SettingsExpander.Content>
-                    <TextBlock FontSize="14" Text="v0.3.0"/>
+                    <TextBlock FontSize="14" Text="v0.4.0"/>
                 </tk:SettingsExpander.Content>
                 <tk:SettingsExpander.Items>
                     <tk:SettingsCard Header="Credits" HorizontalContentAlignment="Left" ContentAlignment="Vertical">
