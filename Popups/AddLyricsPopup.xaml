@@ -9,7 +9,7 @@
     mc:Ignorable="d">
 
     <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-        <TextBlock Text="Choose your source for retrieving lyrics." TextWrapping="Wrap" />
+        <TextBlock Text="Choose your source for retrieving lyrics. Adding lyrics will modify the file." TextWrapping="Wrap" />
         <CheckBox x:Name="SessionCheckbox" Content="Only for this session" Checked="SessionCheckbox_Checked" Unchecked="SessionCheckbox_Unchecked"/>
     </StackPanel>
 </Page>
