@@ -10,6 +10,7 @@
     mc:Ignorable="d">
     <Page.Resources>
         <converters:StringFilledToVisibilityConverter x:Key="StringFilledToVisibilityConverter"/>
+        <converters:LyricsPassConverter x:Key="LyricsPassConverter"/>
     </Page.Resources>
     <ScrollView HorizontalScrollMode="Disabled">
         <StackPanel Margin="32">
@@ -24,17 +25,25 @@
                     TextAlignment="Center"
                     TextWrapping="WrapWholeWords"
                     FontSize="18"/>
-                <Button HorizontalAlignment="Center" Padding="8" Click="AddLyricsButton_Click">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
-                        <SymbolIcon Symbol="Add" VerticalAlignment="Center"/>
-                        <TextBlock Text="Add lyrics" FontSize="16"/>
-                    </StackPanel>
-                </Button>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                    <Button HorizontalAlignment="Center" Padding="8" Click="AddLyricsButton_Click">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+                            <SymbolIcon Symbol="Add" VerticalAlignment="Center"/>
+                            <TextBlock Text="Add lyrics" FontSize="16"/>
+                        </StackPanel>
+                    </Button>
+                    <Button HorizontalAlignment="Center" Padding="8" Click="MarkInstrumentalButton_Click">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+                            <FontIcon Glyph="&#xEC54;" />
+                            <TextBlock Text="Mark as instrumental" FontSize="16"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
             </StackPanel>
             <TextBlock 
                 HorizontalAlignment="Center" 
                 VerticalAlignment="Top" 
-                Text="{x:Bind Audio.CurrentSongPlaying.Lyrics, Mode=OneWay, TargetNullValue='This should not be visible.'}"
+                Text="{x:Bind Audio.CurrentSongPlaying.Lyrics, Mode=OneWay, Converter={StaticResource LyricsPassConverter}, TargetNullValue='This should not be visible.'}"
                 TextAlignment="Center"
                 TextWrapping="WrapWholeWords"
                 FontSize="18"

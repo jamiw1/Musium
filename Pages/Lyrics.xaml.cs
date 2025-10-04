@@ -33,6 +33,7 @@ namespace Musium.Pages
 
         private async void AddLyricsButton_Click(object sender, RoutedEventArgs e)
         {
+            if (Audio.CurrentSongPlaying == null) return;
             ContentDialog dialog = new ContentDialog();
 
             dialog.XamlRoot = XamlRoot;
@@ -51,6 +52,7 @@ namespace Musium.Pages
                     break;
                 case ContentDialogResult.Primary: // online
                     Song currentSong = Audio.CurrentSongPlaying;
+                    if (currentSong == null) return;
                     var artist = WebUtility.UrlEncode(currentSong.ArtistName);
                     var track = WebUtility.UrlEncode(currentSong.Title);
                     var album = WebUtility.UrlEncode(currentSong.Album.Title);
@@ -141,6 +143,14 @@ namespace Musium.Pages
                 default:
                     break;
             }
+        }
+
+        private void MarkInstrumentalButton_Click(object sender, RoutedEventArgs e)
+        {
+            Song currentSong = Audio.CurrentSongPlaying;
+            if (currentSong == null) return;
+            currentSong.Lyrics = "[INSTRUMENTAL]";
+            currentSong.ApplyLyricsToFile();
         }
     }
 }
