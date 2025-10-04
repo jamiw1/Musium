@@ -8,8 +8,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-        <TextBlock Text="Choose your source for retrieving lyrics. Adding lyrics will modify the file." TextWrapping="Wrap" />
+    <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Spacing="4">
+        <TextBlock Text="Choose your source for retrieving lyrics." TextWrapping="Wrap" />
+        <TextBlock TextWrapping="Wrap">Adding lyrics <Run FontWeight="ExtraBold">will modify the file.</Run></TextBlock>
+        
         <CheckBox x:Name="SessionCheckbox" Content="Only for this session" Checked="SessionCheckbox_Checked" Unchecked="SessionCheckbox_Unchecked"/>
     </StackPanel>
 </Page>
