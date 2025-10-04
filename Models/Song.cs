@@ -79,36 +79,23 @@ namespace Musium.Models
                 OnPropertyChanged();
             }
         }
-        public async Task ApplyLyricsToFileAsync()
+        public IOException? AttemptApplyLyricsToFile(string lyrics)
         {
-            const int maxRetries = 20;
-            const int delayOnRetry = 1000; // absolutely a hacky way to do this, however it works for virtual storage so :shrug:
-
-            for (int i = 0; i < maxRetries; i++)
+            try
             {
-                try
+                using (var file = TagLib.File.Create(FilePath))
                 {
-                    using (var file = TagLib.File.Create(FilePath))
-                    {
-                        file.Tag.Lyrics = Lyrics;
-                        file.Save();
-                    }
+                    file.Tag.Lyrics = lyrics;
+                    file.Save();
+                    Lyrics = lyrics;
+                }
 
-                    Debug.WriteLine("lyrics saved successfully.");
-                    return;
-                }
-                catch (IOException ex)
-                {
-                    Debug.WriteLine($"attempt {i + 1} to save lyrics failed. retrying...");
-                    if (i < maxRetries - 1)
-                    {
-                        await Task.Delay(delayOnRetry);
-                    }
-                    else
-                    {
-                        Debug.WriteLine($"failed to save lyrics after {maxRetries} attempts: {ex.Message}");
-                    }
-                }
+                Debug.WriteLine("lyrics saved successfully.");
+                return null;
+            }
+            catch (IOException ex)
+            {
+                return ex;
             }
         }
 

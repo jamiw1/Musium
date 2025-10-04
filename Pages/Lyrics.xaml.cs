@@ -37,6 +37,20 @@ namespace Musium.Pages
             await EditLyrics(true);
         }
 
+        private async void DisplayError(IOException ex)
+        {
+            ContentDialog dialog = new ContentDialog();
+
+            dialog.XamlRoot = XamlRoot;
+            dialog.Title = "An error has occurred.";
+            dialog.CloseButtonText = "Sad";
+            dialog.DefaultButton = ContentDialogButton.Close;
+            dialog.Content = new LyricErrorPopup();
+            LyricErrorPopup content = (LyricErrorPopup)dialog.Content;
+            content.SetText(ex.Message);
+
+            await dialog.ShowAsync();
+        }
         private async Task EditLyrics(bool adding = false)
         {
             if (Audio.CurrentSongPlaying == null) return;
@@ -100,8 +114,14 @@ namespace Musium.Pages
                                 if (Audio.CurrentSongPlaying == null) return;
                                 if (dialog.Content is AddLyricsPopup popup)
                                 {
-                                    Audio.CurrentSongPlaying.Lyrics = lyrics;
-                                    if (!popup.SessionChecked) await Audio.CurrentSongPlaying.ApplyLyricsToFileAsync();
+                                    if (!popup.SessionChecked) 
+                                    {
+                                        var ex = Audio.CurrentSongPlaying.AttemptApplyLyricsToFile(lyrics);
+                                        if (ex != null) DisplayError(ex);
+                                    } else
+                                    {
+                                        Audio.CurrentSongPlaying.Lyrics = lyrics;
+                                    }
                                 }
                                 break;
                             case ContentDialogResult.Secondary:
@@ -139,10 +159,17 @@ namespace Musium.Pages
                     {
                         if (Audio.CurrentSongPlaying == null) return;
                         var text = await package.GetTextAsync();
-                        Audio.CurrentSongPlaying.Lyrics = text;
                         if (dialog.Content is AddLyricsPopup popup)
                         {
-                            if (!popup.SessionChecked) await Audio.CurrentSongPlaying.ApplyLyricsToFileAsync();
+                            if (!popup.SessionChecked) 
+                            {
+                                var ex = Audio.CurrentSongPlaying.AttemptApplyLyricsToFile(text);
+                                if (ex != null) DisplayError(ex);
+                            }
+                            else
+                            {
+                                Audio.CurrentSongPlaying.Lyrics = text;
+                            };
                         }
                     }
                     break;
@@ -150,19 +177,19 @@ namespace Musium.Pages
                     break;
             }
         }
-        private async void ClearLyrics()
+        private void ClearLyrics()
         {
             Song currentSong = Audio.CurrentSongPlaying;
             if (currentSong == null) return;
-            currentSong.Lyrics = "";
-            await currentSong.ApplyLyricsToFileAsync();
+            var ex = currentSong.AttemptApplyLyricsToFile("");
+            if (ex != null) DisplayError(ex);
         }
-        private async void MarkAsInstrumental()
+        private void MarkAsInstrumental()
         {
             Song currentSong = Audio.CurrentSongPlaying;
             if (currentSong == null) return;
-            currentSong.Lyrics = "[INSTRUMENTAL]";
-            await currentSong.ApplyLyricsToFileAsync();
+            var ex = currentSong.AttemptApplyLyricsToFile("[INSTRUMENTAL]");
+            if (ex != null) DisplayError(ex);
         }
         private void MarkInstrumentalButton_Click(object sender, RoutedEventArgs e)
         {
