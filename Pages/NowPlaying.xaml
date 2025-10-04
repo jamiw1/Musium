@@ -17,7 +17,9 @@
         <converters:ShuffleStateToBrushConverter x:Key="ShuffleStateToBrushConverter"/>
         <converters:RepeatStateToBrushConverter x:Key="RepeatStateToBrushConverter"/>
         <converters:RepeatStateToGlyphConverter x:Key="RepeatStateToGlyphConverter"/>
-        
+        <converters:GetFavoritedGlyph x:Key="GetFavoritedGlyph"/>
+        <converters:BoolToAccentBrushConverter x:Key="BoolToAccentBrushConverter"/>
+
         <Style x:Key="PlaybackButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="50"/>
             <Setter Property="Height" Value="50"/>
@@ -38,15 +40,35 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="12" MaxWidth="320">
-            <Frame CornerRadius="4">
+        <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Spacing="12">
+            <Frame CornerRadius="4" HorizontalAlignment="Center">
                 <Image Source="{x:Bind DisplayedCoverArt, Mode=OneWay, TargetNullValue='/Assets/Placeholder.png'}" MaxWidth="320"/>
             </Frame>
-            <StackPanel Spacing="4">
-                <TextBlock Text="{x:Bind Audio.CurrentSongPlaying.Title, Mode=OneWay, TargetNullValue='Nothing is playing.'}" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" FontSize="20" FontWeight="SemiBold"/>
-                <TextBlock Text="{x:Bind Audio.CurrentSongPlaying.Album.Artist.Name, Mode=OneWay, TargetNullValue=''}" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" FontSize="16" FontWeight="Normal"/>
-            </StackPanel>
-            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
+            <RelativePanel HorizontalAlignment="Center">
+                <StackPanel x:Name="SongInfo" Spacing="4" RelativePanel.AlignHorizontalCenterWithPanel="True" MaxWidth="320">
+                    <TextBlock Text="{x:Bind Audio.CurrentSongPlaying.Title, Mode=OneWay, TargetNullValue='Nothing is playing.'}" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" FontSize="20" FontWeight="SemiBold"/>
+                    <TextBlock Text="{x:Bind Audio.CurrentSongPlaying.ArtistName, Mode=OneWay, TargetNullValue=''}" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="WrapWholeWords" FontSize="16" FontWeight="Normal"/>
+                </StackPanel>
+                <Button
+                    Margin="16,0,0,0"
+                    Padding="0"
+                    CornerRadius="20"
+                    RelativePanel.RightOf="SongInfo"
+                    RelativePanel.AlignVerticalCenterWith="SongInfo"
+                    Width="40"
+                    Height="40"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    Click="FavoriteButton_Click">
+                    <FontIcon 
+                        Glyph="{x:Bind Audio.CurrentSongPlaying.Favorited, Mode=OneWay, Converter={StaticResource GetFavoritedGlyph}}" 
+                        Foreground="{x:Bind Audio.CurrentSongPlaying.Favorited, Mode=OneWay, Converter={StaticResource BoolToAccentBrushConverter}}"
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Center"
+                        FontSize="20"/>
+                </Button>
+            </RelativePanel>
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" MaxWidth="320">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -69,7 +91,7 @@
                     Converter={StaticResource DurationConverter},
                     FallbackValue='0:00'}" FontSize="14" FontWeight="Light" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Grid>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+            <StackPanel Orientation="Horizontal" MaxWidth="320" HorizontalAlignment="Center" Spacing="16">
                 <Button Style="{StaticResource PlaybackButtonStyle}" Click="ShuffleButton_Click">
                     <SymbolIcon Symbol="Shuffle" Foreground="{x:Bind Audio.CurrentShuffleState, Mode=OneWay, Converter={StaticResource ShuffleStateToBrushConverter}}"/>
                 </Button>
@@ -94,26 +116,27 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Queue" FontSize="20" FontWeight="SemiBold" Grid.Row="0"/>
-            <Grid
+            <SelectorBar x:Name="SecondPanelSelectorBar"
+                SelectionChanged="SecondPanelSelectorBar_SelectionChanged"
+                Grid.Row="0">
+                <SelectorBarItem x:Name="SelectorBarItemQueue" Text="Queue" IsSelected="True">
+                    <SelectorBarItem.Icon>
+                        <FontIcon Glyph="&#xEA42;" />
+                    </SelectorBarItem.Icon>
+                </SelectorBarItem>
+                <SelectorBarItem x:Name="SelectorBarItemLyrics" Text="Lyrics">
+                    <SelectorBarItem.Icon>
+                        <FontIcon Glyph="&#xED1E;" />
+                    </SelectorBarItem.Icon>
+                </SelectorBarItem>
+            </SelectorBar>
+            <Frame x:Name="ContentFrame" 
+                IsNavigationStackEnabled="False" 
+                Grid.Row="1"
                 CornerRadius="4" 
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1"
-                Grid.Row="1">
-                <ListView
-                    ItemsSource="{x:Bind Audio.Queue}"
-                    Padding="8"
-                    IsItemClickEnabled="True"
-                    CanReorderItems="True"
-                    AllowDrop="True">
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="models:Song">
-                            <controls:QueueListItemControl Song="{x:Bind}"/>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
+                BorderThickness="1"/>
         </Grid>
     </Grid>
 </Page>

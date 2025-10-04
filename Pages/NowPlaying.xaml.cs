@@ -1,14 +1,15 @@
-using Musium.Controls;
-using Musium.Models;
-using Musium.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
+using Musium.Controls;
+using Musium.Models;
+using Musium.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Windows.Devices.Radios;
 using Windows.Foundation;
@@ -24,7 +26,6 @@ using Windows.Foundation.Collections;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage.Streams;
-using System.Threading.Tasks;
 
 namespace Musium.Pages;
 
@@ -36,7 +37,6 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
     public AudioService Audio { get; } = AudioService.Instance;
-    private bool _mouseDown;
 
     public float CurrentTimeStamp { get; set; }
     private BitmapImage? _displayedCoverArt;
@@ -121,6 +121,7 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         if (DispatcherQueue == null) return;
         DispatcherQueue.TryEnqueue(() =>
         {
+            if (TimeElapsed == null) return;
             TimeElapsed.Text = $"{newPos:m\\:ss}";
             SongProgressValue = newPos.TotalSeconds;
         });
@@ -177,5 +178,35 @@ public sealed partial class NowPlaying : Page, INotifyPropertyChanged
         var slider = sender as Slider;
         Audio.ScrubTo((int)Math.Ceiling(ProgressSlider.Value));
         Audio.Resume();
+    }
+
+    private void FavoriteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (Audio.CurrentSongPlaying == null) return;
+        Audio.CurrentSongPlaying.Favorited = !Audio.CurrentSongPlaying.Favorited;
+    }
+    private int previousSelectedIndex;
+    private void SecondPanelSelectorBar_SelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
+    {
+        SelectorBarItem selectedItem = sender.SelectedItem;
+        int currentSelectedIndex = sender.Items.IndexOf(selectedItem);
+        System.Type pageType;
+
+        switch (currentSelectedIndex)
+        {
+            case 0:
+                pageType = typeof(Queue);
+                break;
+            default:
+                pageType = typeof(Lyrics);
+                break;
+        }
+
+        var slideNavigationTransitionEffect = currentSelectedIndex - previousSelectedIndex > 0 ? SlideNavigationTransitionEffect.FromRight : SlideNavigationTransitionEffect.FromLeft;
+
+        ContentFrame.Navigate(pageType, null, new SlideNavigationTransitionInfo() { Effect = slideNavigationTransitionEffect });
+
+        previousSelectedIndex = currentSelectedIndex;
+
     }
 }

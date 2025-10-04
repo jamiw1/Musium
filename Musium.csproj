@@ -22,7 +22,13 @@
     <None Remove="Controls\TitlebarControls.xaml" />
     <None Remove="Controls\TrackItemControl.xaml" />
     <None Remove="Pages\InnerAlbum.xaml" />
+    <None Remove="Pages\Lyrics.xaml" />
     <None Remove="Pages\NowPlaying.xaml" />
+    <None Remove="Pages\Queue.xaml" />
+    <None Remove="Popups\AddLyricsPopup.xaml" />
+    <None Remove="Popups\ClearLyricsPopup.xaml" />
+    <None Remove="Popups\ConfirmLyricsPopup.xaml" />
+    <None Remove="Popups\LyricErrorPopup.xaml" />
     <None Remove="Styles\GridContentStyles.xaml" />
   </ItemGroup>
 
@@ -48,6 +54,7 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.2.250402" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.250402" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4948" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250907003" />
@@ -62,6 +69,24 @@
     <None Update="Assets\Placeholder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Popups\LyricErrorPopup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Popups\ClearLyricsPopup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Popups\ConfirmLyricsPopup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Popups\AddLyricsPopup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Pages\Lyrics.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Pages\Queue.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Pages\Favorites.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

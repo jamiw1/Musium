@@ -17,6 +17,7 @@ using TagLib;
 using TagLib.Riff;
 using Windows.Devices.Radios;
 using Windows.Graphics.Imaging;
+using Windows.Media;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
@@ -35,6 +36,16 @@ namespace Musium.Services
         Off,
         Shuffle
     }
+    public record class LyricResult(
+        int? code = null,
+        int? id = null,
+        string? trackName = null,
+        string? artistName = null,
+        string? albumName = null,
+        float? duration = null,
+        bool? instrumental = null,
+        string? plainLyrics = null,
+        string? syncedLyrics = null);
     public class AudioService : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -42,6 +53,7 @@ namespace Musium.Services
 
         private MediaPlayer _mediaPlayer;
         public event EventHandler<TimeSpan> PositionChanged;
+        private SystemMediaTransportControls _systemMediaTransportControls;
 
         private readonly Random _rng = new Random();
 
@@ -87,6 +99,7 @@ namespace Musium.Services
         private AudioService()
         {
             _mediaPlayer = new MediaPlayer();
+
             _mediaPlayer.PlaybackSession.PositionChanged += OnPlaybackSessionChanged;
             _mediaPlayer.CurrentStateChanged += OnCurrentStateChanged;
             _mediaPlayer.MediaEnded += OnMediaEnded;
@@ -218,17 +231,47 @@ namespace Musium.Services
             dispatcherQueue = newdq;
         }
         
+        private void UpdateSystemTimeline()
+        {
+            var timelineProperties = new SystemMediaTransportControlsTimelineProperties();
 
+            timelineProperties.StartTime = TimeSpan.FromSeconds(0);
+            timelineProperties.MinSeekTime = TimeSpan.FromSeconds(0);
+            timelineProperties.Position = _mediaPlayer.PlaybackSession.Position;
+            timelineProperties.MaxSeekTime = _mediaPlayer.PlaybackSession.NaturalDuration;
+            timelineProperties.EndTime = _mediaPlayer.PlaybackSession.NaturalDuration;
+
+            _systemMediaTransportControls.UpdateTimelineProperties(timelineProperties);
+        }
         private void OnPlaybackSessionChanged(MediaPlaybackSession sender, object args)
         {
             PositionChanged?.Invoke(this, sender.Position);
+            UpdateSystemTimeline();
         }
         private void OnCurrentStateChanged(MediaPlayer sender, object args)
         {
             dispatcherQueue.TryEnqueue(() =>
             {
                 CurrentState = sender.CurrentState;
-            });   
+            });
+            switch (sender.CurrentState)
+            {
+                case MediaPlayerState.Playing:
+                    _systemMediaTransportControls.PlaybackStatus = MediaPlaybackStatus.Playing;
+                    break;
+                case MediaPlayerState.Paused:
+                    _systemMediaTransportControls.PlaybackStatus = MediaPlaybackStatus.Paused;
+                    break;
+                case MediaPlayerState.Stopped:
+                    _systemMediaTransportControls.PlaybackStatus = MediaPlaybackStatus.Stopped;
+                    break;
+                case MediaPlayerState.Closed:
+                    _systemMediaTransportControls.PlaybackStatus = MediaPlaybackStatus.Closed;
+                    break;
+                default:
+                    break;
+            }
+            UpdateSystemTimeline();
         }
         private void OnMediaEnded(MediaPlayer sender, object args)
         {
@@ -350,7 +393,7 @@ namespace Musium.Services
             private set
             {
                 _currentSongPlaying = value;
-                OnPropertyChanged();
+                OnPropertyChanged();                
             }
         }
 
@@ -387,10 +430,45 @@ namespace Musium.Services
         {
             _mediaPlayer?.Play();
         }
-
+        private MediaPlayerElement _element;
         public void SetMediaPlayer(MediaPlayerElement element)
         {
+            _element = element;
             element.SetMediaPlayer(_mediaPlayer);
+
+            _systemMediaTransportControls = _mediaPlayer.SystemMediaTransportControls;
+            _mediaPlayer.CommandManager.IsEnabled = false;
+            _systemMediaTransportControls.IsPlayEnabled = true;
+            _systemMediaTransportControls.IsPauseEnabled = true;
+            _systemMediaTransportControls.IsPreviousEnabled = true;
+            _systemMediaTransportControls.IsNextEnabled = true;
+            _systemMediaTransportControls.IsRewindEnabled = true;
+            _systemMediaTransportControls.IsFastForwardEnabled = true;
+            _systemMediaTransportControls.IsEnabled = true;
+
+
+            _systemMediaTransportControls.ButtonPressed += smtc_ButtonPressed;
+        }
+        private void smtc_ButtonPressed(SystemMediaTransportControls sender, SystemMediaTransportControlsButtonPressedEventArgs args)
+        {
+            switch (args.Button)
+            {
+                case SystemMediaTransportControlsButton.Next:
+                    NextSong();
+                    break;
+
+                case SystemMediaTransportControlsButton.Previous:
+                    PreviousSong();
+                    break;
+
+                case SystemMediaTransportControlsButton.Play:
+                    Resume();
+                    break;
+
+                case SystemMediaTransportControlsButton.Pause:
+                    Pause();
+                    break;
+            }
         }
 
         private async Task<MediaSource> CreateMediaSourceFromMemoryAsync(string filePath)
@@ -410,7 +488,27 @@ namespace Musium.Services
         public async void PlaySong(Song song)
         {
             var source = await CreateMediaSourceFromMemoryAsync(song.FilePath);
-            _mediaPlayer.Source = source;
+            var playbackItem = new MediaPlaybackItem(source);
+
+            SystemMediaTransportControlsDisplayUpdater updater = _systemMediaTransportControls.DisplayUpdater;
+            updater.Type = MediaPlaybackType.Music;
+            updater.MusicProperties.Title = song.Title;
+            updater.MusicProperties.Artist = song.ArtistName;
+            using (var memoryStream = new MemoryStream(song.Album.CoverArtData ?? []))
+            {
+                var randomAccessStream = new InMemoryRandomAccessStream();
+
+                await RandomAccessStream.CopyAsync(
+                    memoryStream.AsInputStream(),
+                    randomAccessStream.GetOutputStreamAt(0) 
+                );
+
+                randomAccessStream.Seek(0);
+                updater.Thumbnail = RandomAccessStreamReference.CreateFromStream(randomAccessStream);
+            }
+            updater.Update();
+
+            _mediaPlayer.Source = playbackItem;
             _mediaPlayer.Play();
 
             CurrentSongPlaying = song;
@@ -462,8 +560,9 @@ namespace Musium.Services
                 {
                     return null;
                 }
+                var artistName = !string.IsNullOrWhiteSpace(tfile.Tag.FirstAlbumArtist) ? tfile.Tag.FirstAlbumArtist.Trim() : tfile.Tag.FirstPerformer.Trim();
 
-                var artist = GetArtistOrCreate(tfile.Tag.FirstPerformer);
+                var artist = GetArtistOrCreate(artistName);
                 var album = GetAlbumOrCreate(artist, tfile.Tag.Album);
 
                 var song = ExtractSongData(tfile, path, album);
@@ -513,6 +612,7 @@ namespace Musium.Services
             {
                 Title = tfile.Tag.Title,
                 Album = album,
+                ArtistName = tfile.Tag.FirstPerformer,
                 FilePath = path,
                 Genre = tfile.Tag.FirstGenre,
                 Duration = tfile.Properties.Duration,
@@ -520,6 +620,20 @@ namespace Musium.Services
                 Lossless = IsLossless(path)
             };
             song.Favorited = song.RetrieveFavorited();
+            var lyrics = tfile.Tag.Lyrics;
+            if (!string.IsNullOrWhiteSpace(lyrics))
+            {
+                song.Lyrics = lyrics;
+            } 
+            else
+            {
+                var parent = Path.GetDirectoryName(path);
+                var lrcPath = Path.Combine(parent, $"{Path.GetFileNameWithoutExtension(path)}.lrc");
+                if (System.IO.File.Exists(lrcPath))
+                {
+                    song.Lyrics = System.IO.File.ReadAllText(lrcPath);
+                }
+            }
 
             album.Songs.Add(song);
             album.Songs.OrderBy(song => song.TrackNumber);
@@ -563,12 +677,16 @@ namespace Musium.Services
             return losslessAudioExtensions.Contains(extension);
         }
 
+        private bool _currentlyScanning = false;
         public async void SetLibrary(string targetDirectory)
         {
+            if (_currentlyScanning) return;
+            _currentlyScanning = true;
             Database.Clear();
             await Task.Run(async () =>
             {
                 await ScanDirectoryIntoLibrary(targetDirectory);
+                _currentlyScanning = false;
             });
         }
 

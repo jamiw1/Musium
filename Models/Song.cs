@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Windows.Devices.Radios;
 using Windows.Media.Core;
 
@@ -35,6 +36,17 @@ namespace Musium.Models
             }
         }
 
+        private string _artistName;
+        public string ArtistName
+        {
+            get => _artistName;
+            set
+            {
+                _artistName = value;
+                OnPropertyChanged();
+            }
+        }
+
         private string _filePath;
         public string FilePath
         {
@@ -54,6 +66,36 @@ namespace Musium.Models
             {
                 _genre = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private string? _lyrics;
+        public string? Lyrics
+        {
+            get => _lyrics;
+            set
+            {
+                _lyrics = value;
+                OnPropertyChanged();
+            }
+        }
+        public IOException? AttemptApplyLyricsToFile(string lyrics)
+        {
+            try
+            {
+                using (var file = TagLib.File.Create(FilePath))
+                {
+                    file.Tag.Lyrics = lyrics;
+                    file.Save();
+                    Lyrics = lyrics;
+                }
+
+                Debug.WriteLine("lyrics saved successfully.");
+                return null;
+            }
+            catch (IOException ex)
+            {
+                return ex;
             }
         }
 

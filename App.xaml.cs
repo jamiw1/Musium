@@ -21,13 +21,14 @@ using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace Musium
 {
     public partial class App : Application
     {
         public static Window MainWindow { get; private set; }
-
+        public static HttpClient LyricHttpClient { get; private set; }
         public App()
         {
             InitializeComponent();
@@ -36,6 +37,9 @@ namespace Musium
         {
             MainWindow = new MainWindow();
             MainWindow.Activate();
+
+            LyricHttpClient = new HttpClient();
+            LyricHttpClient.BaseAddress = new Uri("https://lrclib.net/api/");
 
             var Audio = AudioService.Instance;
             await Task.Run(async () =>
