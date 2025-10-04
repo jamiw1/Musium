@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Windows.Devices.Radios;
 using Windows.Media.Core;
 
@@ -78,11 +79,37 @@ namespace Musium.Models
                 OnPropertyChanged();
             }
         }
-        public void ApplyLyricsToFile()
+        public async Task ApplyLyricsToFileAsync()
         {
-            using var file = TagLib.File.Create(FilePath);
-            file.Tag.Lyrics = Lyrics;
-            file.Save();
+            const int maxRetries = 20;
+            const int delayOnRetry = 1000; // absolutely a hacky way to do this, however it works for virtual storage so :shrug:
+
+            for (int i = 0; i < maxRetries; i++)
+            {
+                try
+                {
+                    using (var file = TagLib.File.Create(FilePath))
+                    {
+                        file.Tag.Lyrics = Lyrics;
+                        file.Save();
+                    }
+
+                    Debug.WriteLine("lyrics saved successfully.");
+                    return;
+                }
+                catch (IOException ex)
+                {
+                    Debug.WriteLine($"attempt {i + 1} to save lyrics failed. retrying...");
+                    if (i < maxRetries - 1)
+                    {
+                        await Task.Delay(delayOnRetry);
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"failed to save lyrics after {maxRetries} attempts: {ex.Message}");
+                    }
+                }
+            }
         }
 
         private int? _trackNumber;

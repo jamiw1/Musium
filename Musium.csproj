@@ -26,6 +26,7 @@
     <None Remove="Pages\NowPlaying.xaml" />
     <None Remove="Pages\Queue.xaml" />
     <None Remove="Popups\AddLyricsPopup.xaml" />
+    <None Remove="Popups\ClearLyricsPopup.xaml" />
     <None Remove="Popups\ConfirmLyricsPopup.xaml" />
     <None Remove="Styles\GridContentStyles.xaml" />
   </ItemGroup>
@@ -67,6 +68,9 @@
     <None Update="Assets\Placeholder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Popups\ClearLyricsPopup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Popups\ConfirmLyricsPopup.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

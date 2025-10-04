@@ -13,11 +13,6 @@
         <converters:LyricsPassConverter x:Key="LyricsPassConverter"/>
     </Page.Resources>
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0">
-        <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="16">
-            <Button Width="32" Height="32" Padding="0">
-                <SymbolIcon Symbol="More"/>
-            </Button>
-        </Grid>
         <ScrollView HorizontalScrollMode="Disabled" Padding="32,0">
             <StackPanel Margin="16">
                 <StackPanel
@@ -57,5 +52,34 @@
 
             </StackPanel>
         </ScrollView>
+        <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Margin="16">
+            <Button 
+                Width="32" 
+                Height="32" 
+                Padding="0" 
+                Visibility="{x:Bind Audio.CurrentSongPlaying.Lyrics, Mode=OneWay, Converter={StaticResource StringFilledToVisibilityConverter}}">
+                <SymbolIcon Symbol="More"/>
+                <Button.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Edit" Tag="edit" Click="MenuFlyoutItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Edit"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Text="Clear lyrics" Tag="clear" Click="MenuFlyoutItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <SymbolIcon Symbol="Delete"/>
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Mark as instrumental" Tag="instrumental" Click="MenuFlyoutItem_Click">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xEC54;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+        </Grid>
     </Grid>
 </Page>

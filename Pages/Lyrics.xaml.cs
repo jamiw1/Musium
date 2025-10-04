@@ -17,6 +17,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -33,11 +34,16 @@ namespace Musium.Pages
 
         private async void AddLyricsButton_Click(object sender, RoutedEventArgs e)
         {
+            await EditLyrics(true);
+        }
+
+        private async Task EditLyrics(bool adding = false)
+        {
             if (Audio.CurrentSongPlaying == null) return;
             ContentDialog dialog = new ContentDialog();
 
             dialog.XamlRoot = XamlRoot;
-            dialog.Title = "Add lyrics";
+            dialog.Title = adding ? "Add lyrics" : "Edit lyrics";
             dialog.PrimaryButtonText = "Online";
             dialog.SecondaryButtonText = "Clipboard";
             dialog.CloseButtonText = "Cancel";
@@ -95,7 +101,7 @@ namespace Musium.Pages
                                 if (dialog.Content is AddLyricsPopup popup)
                                 {
                                     Audio.CurrentSongPlaying.Lyrics = lyrics;
-                                    if (!popup.SessionChecked) Audio.CurrentSongPlaying.ApplyLyricsToFile();
+                                    if (!popup.SessionChecked) await Audio.CurrentSongPlaying.ApplyLyricsToFileAsync();
                                 }
                                 break;
                             case ContentDialogResult.Secondary:
@@ -136,7 +142,7 @@ namespace Musium.Pages
                         Audio.CurrentSongPlaying.Lyrics = text;
                         if (dialog.Content is AddLyricsPopup popup)
                         {
-                            if (!popup.SessionChecked) Audio.CurrentSongPlaying.ApplyLyricsToFile();
+                            if (!popup.SessionChecked) await Audio.CurrentSongPlaying.ApplyLyricsToFileAsync();
                         }
                     }
                     break;
@@ -144,13 +150,64 @@ namespace Musium.Pages
                     break;
             }
         }
-
-        private void MarkInstrumentalButton_Click(object sender, RoutedEventArgs e)
+        private async void ClearLyrics()
+        {
+            Song currentSong = Audio.CurrentSongPlaying;
+            if (currentSong == null) return;
+            currentSong.Lyrics = "";
+            await currentSong.ApplyLyricsToFileAsync();
+        }
+        private async void MarkAsInstrumental()
         {
             Song currentSong = Audio.CurrentSongPlaying;
             if (currentSong == null) return;
             currentSong.Lyrics = "[INSTRUMENTAL]";
-            currentSong.ApplyLyricsToFile();
+            await currentSong.ApplyLyricsToFileAsync();
+        }
+        private void MarkInstrumentalButton_Click(object sender, RoutedEventArgs e)
+        {
+            MarkAsInstrumental();
+        }
+
+        private async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuFlyoutItem selectedItem)
+            {
+                string sortOption = selectedItem.Tag.ToString();
+                switch (sortOption)
+                {
+                    case "edit":
+                        await EditLyrics();
+                        break;
+                    case "clear":
+                        ContentDialog confirmDialog = new ContentDialog();
+
+                        confirmDialog.XamlRoot = XamlRoot;
+                        confirmDialog.Title = "Clear lyrics?";
+                        confirmDialog.PrimaryButtonText = "Yes";
+                        confirmDialog.CloseButtonText = "No, cancel";
+                        confirmDialog.DefaultButton = ContentDialogButton.Close;
+                        confirmDialog.Content = new ClearLyricsPopup();
+
+                        var result = await confirmDialog.ShowAsync();
+                        switch (result)
+                        {
+                            case ContentDialogResult.None:
+                                break;
+                            case ContentDialogResult.Primary:
+                                ClearLyrics();
+                                break;
+                            case ContentDialogResult.Secondary:
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case "instrumental":
+                        MarkAsInstrumental();
+                        break;
+                }
+            }
         }
     }
 }
