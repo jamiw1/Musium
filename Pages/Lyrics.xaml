@@ -61,7 +61,7 @@
                 <SymbolIcon Symbol="More"/>
                 <Button.Flyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="Edit" Tag="edit" Click="MenuFlyoutItem_Click">
+                        <MenuFlyoutItem Text="Edit lyrics" Tag="edit" Click="MenuFlyoutItem_Click">
                             <MenuFlyoutItem.Icon>
                                 <SymbolIcon Symbol="Edit"/>
                             </MenuFlyoutItem.Icon>
